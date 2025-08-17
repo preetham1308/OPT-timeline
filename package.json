@@ -1,0 +1,37 @@
+{
+  "name": "opt-timeline-planner",
+  "version": "1.0.0",
+  "description": "A production-grade OPT Timeline Planner with dark theme, mobile optimization, and USCIS integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "opt",
+    "timeline",
+    "planner",
+    "f1",
+    "student",
+    "visa",
+    "uscis",
+    "immigration",
+    "graduation",
+    "stem",
+    "extension"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_USERNAME/opt-planner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/opt-planner/issues"
+  },
+  "homepage": "https://YOUR_USERNAME.github.io/opt-planner",
+  "devDependencies": {},
+  "dependencies": {}
+} 
