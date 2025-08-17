@@ -107,120 +107,25 @@ class OPTPlanner {
 
   initCustomDatePicker() {
     const graduationInput = document.getElementById('graduationDate');
-    const customPicker = document.getElementById('customGraduationPicker');
-    const dateDisplay = document.getElementById('dateDisplay');
-    const dateText = dateDisplay.querySelector('.date-text');
-    const openDatePickerBtn = document.getElementById('openDatePicker');
     
-    // Mobile detection
+    // Set default date to today
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    graduationInput.value = todayString;
+    
+    // Auto-calculate when date changes
+    graduationInput.addEventListener('change', () => {
+      this.autoCalculate();
+    });
+    
+    // Mobile detection for logging
     const isMobile = () => {
       return window.innerWidth <= 768 || 
              /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     };
     
-    // Initialize date selector
-    this.initializeDateSelector();
-    
-    // Show custom picker when button is clicked
-    openDatePickerBtn.addEventListener('click', () => {
-      // Track date picker open
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'date_picker_open', {
-          'event_category': 'engagement',
-          'event_label': 'graduation_date'
-        });
-      }
-      
-      customPicker.style.display = 'block';
-      
-      // Prevent body scroll on mobile
-      if (isMobile()) {
-        document.body.classList.add('date-picker-open');
-      }
-    });
-
-    // Close picker when close button is clicked
-    document.getElementById('closeDatePicker').addEventListener('click', () => {
-      customPicker.style.display = 'none';
-      if (isMobile()) {
-        document.body.classList.remove('date-picker-open');
-      }
-    });
-
-    // Set date when Set Date button is clicked
-    document.getElementById('setDateBtn').addEventListener('click', () => {
-      const month = parseInt(document.getElementById('monthSelect').value);
-      const day = parseInt(document.getElementById('daySelect').value);
-      const year = parseInt(document.getElementById('yearSelect').value);
-      
-      if (day && year) {
-        const selectedDate = new Date(year, month, day);
-        this.selectedDate = selectedDate;
-        this.updateDateInput(this.selectedDate);
-        
-        // Track successful date selection
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'date_selected', {
-            'event_category': 'engagement',
-            'event_label': 'graduation_date',
-            'value': selectedDate.toISOString().split('T')[0]
-          });
-        }
-        
-        customPicker.style.display = 'none';
-        
-        if (isMobile()) {
-          document.body.classList.remove('date-picker-open');
-        }
-      }
-    });
-
-    // Today button functionality
-    document.getElementById('todayBtn').addEventListener('click', () => {
-      const today = new Date();
-      this.selectedDate = today;
-      this.updateDateInput(this.selectedDate);
-      this.setDateSelectorValues(today);
-      customPicker.style.display = 'none';
-      
-      if (isMobile()) {
-        document.body.classList.remove('date-picker-open');
-      }
-    });
-
-    // Hide picker when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!customPicker.contains(e.target) && e.target !== openDatePickerBtn) {
-        customPicker.style.display = 'none';
-        if (isMobile()) {
-          document.body.classList.remove('date-picker-open');
-        }
-      }
-    });
-
-    // Additional mobile close handlers
     if (isMobile()) {
-      // Close on escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && customPicker.style.display === 'block') {
-          customPicker.style.display = 'none';
-          document.body.classList.remove('date-picker-open');
-        }
-      });
-      
-      // Close on touch outside (mobile specific)
-      document.addEventListener('touchstart', (e) => {
-        if (!customPicker.contains(e.target) && e.target !== openDatePickerBtn) {
-          customPicker.style.display = 'none';
-          document.body.classList.remove('date-picker-open');
-        }
-      });
-    }
-    
-    // Mobile test - log mobile status
-    if (isMobile()) {
-      console.log('Mobile device detected - Simple date selector enabled');
-      customPicker.style.display = 'none';
+      console.log('Mobile device detected - Native date picker enabled');
     }
   }
 
@@ -886,82 +791,7 @@ class OPTPlanner {
     }, 300);
   }
 
-  initializeDateSelector() {
-    // Populate year selector (current year + 10 years)
-    const yearSelect = document.getElementById('yearSelect');
-    const currentYear = new Date().getFullYear();
-    
-    for (let year = currentYear; year <= currentYear + 10; year++) {
-      const option = document.createElement('option');
-      option.value = year;
-      option.textContent = year;
-      yearSelect.appendChild(option);
-    }
-    
-    // Set current year as default
-    yearSelect.value = currentYear;
-    
-    // Populate day selector
-    this.updateDaySelector();
-    
-    // Set current month as default
-    const monthSelect = document.getElementById('monthSelect');
-    monthSelect.value = new Date().getMonth();
-    
-    // Update days when month changes
-    monthSelect.addEventListener('change', () => {
-      this.updateDaySelector();
-    });
-    
-    // Update days when year changes
-    yearSelect.addEventListener('change', () => {
-      this.updateDaySelector();
-    });
-  }
-  
-  updateDaySelector() {
-    const monthSelect = document.getElementById('monthSelect');
-    const yearSelect = document.getElementById('yearSelect');
-    const daySelect = document.getElementById('daySelect');
-    
-    const month = parseInt(monthSelect.value);
-    const year = parseInt(yearSelect.value);
-    
-    // Clear existing days
-    daySelect.innerHTML = '';
-    
-    // Get number of days in selected month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    // Add day options
-    for (let day = 1; day <= daysInMonth; day++) {
-      const option = document.createElement('option');
-      option.value = day;
-      option.textContent = day;
-      daySelect.appendChild(option);
-    }
-    
-    // Set current day as default
-    const currentDay = new Date().getDate();
-    if (currentDay <= daysInMonth) {
-      daySelect.value = currentDay;
-    }
-  }
-  
-  setDateSelectorValues(date) {
-    const monthSelect = document.getElementById('monthSelect');
-    const daySelect = document.getElementById('daySelect');
-    const yearSelect = document.getElementById('yearSelect');
-    
-    monthSelect.value = date.getMonth();
-    yearSelect.value = date.getFullYear();
-    
-    // Update days for the selected month/year
-    this.updateDaySelector();
-    
-    // Set the day
-    daySelect.value = date.getDate();
-  }
+  // Native date input is now used - no need for complex custom functions
 }
 
 // Initialize the planner when DOM is loaded
