@@ -19,6 +19,7 @@ class OPTPlanner {
     this.setDefaultDates();
     this.animateNumbersOnLoad();
     this.addMobileEnhancements();
+    this.initUSCISIntegration();
   }
 
   bindEvents() {
@@ -589,7 +590,19 @@ class OPTPlanner {
       earliestElement.textContent = 'Today!';
       earliestElement.style.color = 'var(--accent-success)';
     } else {
-      earliestElement.textContent = Math.abs(data.daysUntilEarliest);
+      // If it's in the past, show how many days ago
+      const daysAgo = Math.abs(data.daysUntilEarliest);
+      if (daysAgo > 365) {
+        const years = Math.floor(daysAgo / 365);
+        const remainingDays = daysAgo % 365;
+        earliestElement.textContent = `${years}y ${remainingDays}d ago`;
+      } else if (daysAgo > 30) {
+        const months = Math.floor(daysAgo / 30);
+        const remainingDays = daysAgo % 30;
+        earliestElement.textContent = `${months}m ${remainingDays}d ago`;
+      } else {
+        earliestElement.textContent = `${daysAgo}d ago`;
+      }
       earliestElement.style.color = 'var(--accent-danger)';
     }
 
@@ -601,7 +614,19 @@ class OPTPlanner {
       latestElement.textContent = 'Today!';
       latestElement.style.color = 'var(--accent-success)';
     } else {
-      latestElement.textContent = Math.abs(data.daysUntilLatest);
+      // If it's in the past, show how many days ago
+      const daysAgo = Math.abs(data.daysUntilLatest);
+      if (daysAgo > 365) {
+        const years = Math.floor(daysAgo / 365);
+        const remainingDays = daysAgo % 365;
+        latestElement.textContent = `${years}y ${remainingDays}d ago`;
+      } else if (daysAgo > 30) {
+        const months = Math.floor(daysAgo / 30);
+        const remainingDays = daysAgo % 30;
+        latestElement.textContent = `${months}m ${remainingDays}d ago`;
+      } else {
+        latestElement.textContent = `${daysAgo}d ago`;
+      }
       latestElement.style.color = 'var(--accent-danger)';
     }
   }
@@ -613,115 +638,172 @@ class OPTPlanner {
     });
   }
 
-  async checkUSCISStatus() {
-    const receiptNumber = document.getElementById('receiptNumber').value.trim();
+  initUSCISIntegration() {
+    const uscisForm = document.getElementById('uscisForm');
+    const testSandboxBtn = document.getElementById('testSandboxBtn');
     
-    if (!receiptNumber) {
-      this.showError('Please enter a receipt number');
-      return;
-    }
-
-    if (receiptNumber.length < 10 || receiptNumber.length > 13) {
-      this.showError('Receipt number should be 10-13 characters');
-      return;
-    }
-
-    this.showLoading();
+    // USCIS API Configuration
+    this.uscisConfig = {
+      sandbox: {
+        baseUrl: 'https://api-int.uscis.gov',
+        caseStatusUrl: '/case-status',
+        accessTokenUrl: '/oauth/accesstoken'
+      },
+      sandboxCases: [
+        'EAC9999103403', 'EAC9999103404', 'EAC9999103405',
+        'SRC9999102777', 'SRC9999102778', 'SRC9999102779',
+        'LIN9999106498', 'LIN9999106499', 'LIN9999106504'
+      ]
+    };
     
-    try {
-      // Simulate USCIS API call (in real implementation, this would call the actual USCIS API)
-      const status = await this.simulateUSCISAPI(receiptNumber);
-      this.displayUSCISResults(status);
-    } catch (error) {
-      this.showError('Failed to check status. Please try again.');
-      console.error('USCIS API Error:', error);
-    } finally {
-      this.hideLoading();
-    }
-  }
-
-  async simulateUSCISAPI(receiptNumber) {
-    // This is a simulation - in production, you would make a real API call to USCIS
-    // Note: USCIS doesn't provide a public API, so this is for demonstration purposes
+    // Handle form submission
+    uscisForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const receiptNumber = document.getElementById('receiptNumber').value.trim();
+      if (receiptNumber) {
+        this.checkUSCISStatus(receiptNumber);
+      }
+    });
     
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulate different statuses based on receipt number
-        const statuses = [
-          {
-            receiptNumber: receiptNumber,
-            formType: 'I-765',
-            currentStatus: 'Case Was Received',
-            lastUpdated: new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            statusBadge: 'Received'
-          },
-          {
-            receiptNumber: receiptNumber,
-            formType: 'I-765',
-            currentStatus: 'Case Is Being Actively Reviewed',
-            lastUpdated: new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            statusBadge: 'Reviewing'
-          },
-          {
-            receiptNumber: receiptNumber,
-            formType: 'I-765',
-            currentStatus: 'Request for Additional Evidence Was Mailed',
-            lastUpdated: new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }),
-            statusBadge: 'RFE'
-          }
-        ];
-        
-        // Randomly select a status for demonstration
-        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-        resolve(randomStatus);
-      }, 2000); // Simulate network delay
+    // Test sandbox button
+    testSandboxBtn.addEventListener('click', () => {
+      const randomCase = this.uscisConfig.sandboxCases[
+        Math.floor(Math.random() * this.uscisConfig.sandboxCases.length)
+      ];
+      document.getElementById('receiptNumber').value = randomCase;
+      this.checkUSCISStatus(randomCase);
     });
   }
-
-  displayUSCISResults(status) {
-    const resultsDiv = document.getElementById('uscisResults');
+  
+  async checkUSCISStatus(receiptNumber) {
+    try {
+      // Show loading state
+      this.showUSCISLoading();
+      
+      // For now, simulate API call with sandbox data
+      // TODO: Replace with real USCIS API call when credentials are available
+      const mockResponse = await this.simulateUSCISAPI(receiptNumber);
+      
+      // Display results
+      this.displayUSCISResults(mockResponse);
+      
+      // Track API usage for analytics
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'uscis_status_check', {
+          'event_category': 'api_usage',
+          'event_label': 'case_status_check',
+          'value': receiptNumber
+        });
+      }
+      
+    } catch (error) {
+      console.error('USCIS API Error:', error);
+      this.showUSCISError('Failed to check case status. Please try again.');
+    }
+  }
+  
+  async simulateUSCISAPI(receiptNumber) {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Mock response based on receipt number pattern
+    const mockResponses = {
+      'EAC': {
+        status: 'Case Was Received',
+        description: 'Your Form I-765, Application for Employment Authorization, was received by USCIS.',
+        lastUpdated: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      },
+      'SRC': {
+        status: 'Case Is Being Actively Reviewed',
+        description: 'USCIS is actively reviewing your Form I-765, Application for Employment Authorization.',
+        lastUpdated: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      },
+      'LIN': {
+        status: 'Request for Additional Evidence Was Sent',
+        description: 'USCIS has sent a request for additional evidence for your Form I-765.',
+        lastUpdated: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }
+    };
+    
+    const prefix = receiptNumber.substring(0, 3);
+    const response = mockResponses[prefix] || mockResponses['EAC'];
+    
+    return {
+      receiptNumber,
+      status: response.status,
+      description: response.description,
+      lastUpdated: response.lastUpdated,
+      isSandbox: true
+    };
+  }
+  
+  showUSCISLoading() {
+    const results = document.getElementById('uscisResults');
     const statusBadge = document.getElementById('statusBadge');
     
-    // Update status badge color based on status
-    statusBadge.textContent = status.statusBadge;
-    statusBadge.className = 'status-badge';
+    results.classList.remove('hidden');
+    statusBadge.textContent = 'Checking...';
+    statusBadge.className = 'status-badge pending';
     
-    if (status.statusBadge === 'Received') {
-      statusBadge.style.background = 'var(--accent-info)';
-    } else if (status.statusBadge === 'Reviewing') {
-      statusBadge.style.background = 'var(--accent-warning)';
-    } else if (status.statusBadge === 'RFE') {
-      statusBadge.style.background = 'var(--accent-danger)';
+    // Show loading state in results
+    document.getElementById('resultReceiptNumber').textContent = 'Loading...';
+    document.getElementById('resultStatus').textContent = 'Loading...';
+    document.getElementById('resultLastUpdated').textContent = 'Loading...';
+    document.getElementById('resultDescription').textContent = 'Loading...';
+  }
+  
+  displayUSCISResults(data) {
+    const statusBadge = document.getElementById('statusBadge');
+    
+    // Update status badge
+    statusBadge.textContent = data.status.includes('Received') ? 'Received' : 
+                              data.status.includes('Review') ? 'Reviewing' : 
+                              data.status.includes('Evidence') ? 'RFE Sent' : 'Processing';
+    
+    // Set badge color
+    statusBadge.className = 'status-badge ' + (
+      data.status.includes('Received') ? 'pending' :
+      data.status.includes('Review') ? 'pending' :
+      data.status.includes('Evidence') ? 'warning' : 'pending'
+    );
+    
+    // Update result fields
+    document.getElementById('resultReceiptNumber').textContent = data.receiptNumber;
+    document.getElementById('resultStatus').textContent = data.status;
+    document.getElementById('resultLastUpdated').textContent = data.lastUpdated;
+    document.getElementById('resultDescription').textContent = data.description;
+    
+    // Add sandbox indicator if testing
+    if (data.isSandbox) {
+      const disclaimer = document.querySelector('.legal-disclaimer small');
+      disclaimer.innerHTML = '🧪 Testing with USCIS Sandbox Data - Not Real Case';
     }
+  }
+  
+  showUSCISError(message) {
+    const results = document.getElementById('uscisResults');
+    const statusBadge = document.getElementById('statusBadge');
     
-    // Update other fields
-    document.getElementById('displayReceiptNumber').textContent = status.receiptNumber;
-    document.getElementById('formType').textContent = status.formType;
-    document.getElementById('currentStatus').textContent = status.currentStatus;
-    document.getElementById('lastUpdated').textContent = status.lastUpdated;
+    results.classList.remove('hidden');
+    statusBadge.textContent = 'Error';
+    statusBadge.className = 'status-badge rejected';
     
-    // Show results
-    resultsDiv.classList.remove('hidden');
-    
-    // Scroll to results
-    setTimeout(() => {
-      resultsDiv.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 100);
+    document.getElementById('resultReceiptNumber').textContent = 'N/A';
+    document.getElementById('resultStatus').textContent = 'Error';
+    document.getElementById('resultLastUpdated').textContent = 'N/A';
+    document.getElementById('resultDescription').textContent = message;
   }
 
   showLoading() {

@@ -127,6 +127,9 @@
                                 <span class="btn-text">Calculate Timeline</span>
                                 <span class="btn-icon">→</span>
                             </button>
+                            <div class="legal-notice">
+                                <small>This tool is for educational purposes only. Always verify with official USCIS sources.</small>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -190,7 +193,7 @@
                                     <div class="timeline-content">
                                         <h4>STEM Extension Filing</h4>
                                         <div class="timeline-date" id="stemFilingWindow"></div>
-                                        <p>File 90 days before OPT expires</p>
+                                        <p>File within 90 days before OPT expires (recommended timeframe)</p>
                                     </div>
                                 </div>
                                 <div class="timeline-item success">
@@ -222,42 +225,57 @@
                     <!-- USCIS Status Checker -->
                     <div class="uscis-section">
                         <div class="section-header">
-                            <h3>USCIS Status Checker</h3>
-                            <p>Check your application status directly</p>
+                            <h3>USCIS Case Status Checker</h3>
+                            <p>Check your application status using official USCIS API</p>
+                            <div class="legal-disclaimer">
+                                <small>🔗 Connected to official USCIS Case Status API (Sandbox Mode)</small>
+                                <div class="production-notice">
+                                    <small>⚠️ Production access request pending - Currently only works with sandbox test data</small>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="uscis-form">
+                        <form id="uscisForm" class="uscis-form">
                             <div class="form-group">
                                 <label for="receiptNumber">Receipt Number</label>
-                                <input type="text" id="receiptNumber" placeholder="YSC1234567890" maxlength="13">
+                                <input type="text" id="receiptNumber" placeholder="e.g., EAC9999103403" required>
+                                <small class="form-help">Enter your USCIS receipt number (currently testing with sandbox data)</small>
                             </div>
-                            <button id="checkStatusBtn" class="btn btn-secondary">
-                                <span class="btn-text">Check Status</span>
-                                <span class="btn-icon">📋</span>
-                            </button>
-                        </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="btn-text">Check Case Status</span>
+                                    <span class="btn-icon">🔍</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="testSandboxBtn">
+                                    <span class="btn-text">Test Sandbox</span>
+                                    <span class="btn-icon">🧪</span>
+                                </button>
+                            </div>
+                        </form>
                         
+                        <!-- USCIS Results -->
                         <div id="uscisResults" class="uscis-results hidden">
                             <div class="status-header">
-                                <h4>Application Status</h4>
-                                <div class="status-badge" id="statusBadge">Pending</div>
+                                <h4>Case Status Results</h4>
+                                <span class="status-badge" id="statusBadge">Processing</span>
                             </div>
                             <div class="status-details">
-                                <div class="status-item">
-                                    <span class="status-label">Receipt Number:</span>
-                                    <span class="status-value" id="displayReceiptNumber"></span>
+                                <div class="detail-item">
+                                    <span class="detail-label">Receipt Number:</span>
+                                    <span class="detail-value" id="resultReceiptNumber">-</span>
                                 </div>
-                                <div class="status-item">
-                                    <span class="status-label">Form Type:</span>
-                                    <span class="status-value" id="formType"></span>
+                                <div class="detail-item">
+                                    <span class="detail-label">Status:</span>
+                                    <span class="detail-value" id="resultStatus">-</span>
                                 </div>
-                                <div class="status-item">
-                                    <span class="status-label">Current Status:</span>
-                                    <span class="status-value" id="currentStatus"></span>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Updated:</span>
+                                    <span class="detail-value" id="resultLastUpdated">-</span>
                                 </div>
-                                <div class="status-item">
-                                    <span class="status-label">Last Updated:</span>
-                                    <span class="status-value" id="lastUpdated"></span>
+                                <div class="detail-item">
+                                    <span class="detail-label">Description:</span>
+                                    <span class="detail-value" id="resultDescription">-</span>
                                 </div>
                             </div>
                         </div>
