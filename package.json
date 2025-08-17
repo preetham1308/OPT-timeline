@@ -22,16 +22,16 @@
     "stem",
     "extension"
   ],
-  "author": "Your Name",
+  "author": "preetham1308",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YOUR_USERNAME/opt-planner.git"
+    "url": "git+https://github.com/preetham1308/OPT-timeline.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/opt-planner/issues"
+    "url": "https://github.com/preetham1308/OPT-timeline/issues"
   },
-  "homepage": "https://YOUR_USERNAME.github.io/opt-planner",
+  "homepage": "https://preetham1308.github.io/OPT-timeline",
   "devDependencies": {},
   "dependencies": {}
 } 
