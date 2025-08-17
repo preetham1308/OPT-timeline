@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Date Picker Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #333;
+            color: white;
+        }
+        
+        .date-input-wrapper {
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .custom-date-picker {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            z-index: 10000;
+            background: #2a2a2a;
+            border: 2px solid red;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 20px;
+            min-width: 300px;
+            display: none;
+        }
+        
+        .custom-date-picker.active {
+            display: block;
+            border-color: green;
+        }
+        
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .picker-nav {
+            background: #444;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .current-month {
+            font-weight: bold;
+        }
+        
+        .picker-days-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .picker-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .picker-day {
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            background: #444;
+        }
+        
+        .picker-day:hover {
+            background: #666;
+        }
+        
+        .picker-day.selected {
+            background: #007bff;
+        }
+        
+        .picker-day.today {
+            background: #28a745;
+        }
+        
+        .picker-day.other-month {
+            color: #666;
+        }
+        
+        .picker-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .picker-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #444;
+            color: white;
+        }
+        
+        .picker-btn:hover {
+            background: #666;
+        }
+        
+        .date-trigger-btn {
+            width: 100%;
+            padding: 12px;
+            background: #444;
+            border: 1px solid #666;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .date-trigger-btn:hover {
+            background: #555;
+        }
+        
+        .date-trigger-btn.selected {
+            background: #007bff;
+            border-color: #007bff;
+        }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>STEM Date Picker Test</h1>
+        
+        <div class="form-group">
+            <label for="isSTEM">STEM Extension:</label>
+            <select id="isSTEM">
+                <option value="no">No (12 months)</option>
+                <option value="yes">Yes (24 months)</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="stemOptEndGroup" style="display: none;">
+            <label for="stemOptEndDate">OPT End Date:</label>
+            <div class="date-input-wrapper">
+                <div class="custom-date-picker" id="stemCustomDatePicker">
+                    <div class="picker-header">
+                        <button type="button" class="picker-nav" id="stemPrevMonth">‹</button>
+                        <span class="current-month" id="stemCurrentMonth">December 2024</span>
+                        <button type="button" class="picker-nav" id="stemNextMonth">›</button>
+                    </div>
+                    <div class="picker-days-header">
+                        <span>Sun</span>
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                    </div>
+                    <div class="picker-days" id="stemPickerDays"></div>
+                    <div class="picker-actions">
+                        <button type="button" class="picker-btn today-btn" id="stemTodayBtn">Today</button>
+                        <button type="button" class="picker-btn clear-btn" id="stemClearBtn">Clear</button>
+                    </div>
+                </div>
+                <button type="button" class="date-trigger-btn" id="stemDateTriggerBtn">
+                    <span>📊</span>
+                    <span class="btn-text">Choose OPT End Date</span>
+                </button>
+                <input type="hidden" id="stemOptEndDate">
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>Debug Info:</h3>
+            <div id="debugOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        class STEMDatePickerTest {
+            constructor() {
+                this.selectedStemDate = null;
+                this.stemCurrentDate = new Date();
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.initSTEMDatePicker();
+                this.log('✅ STEM Date Picker Test initialized');
+            }
+
+            bindEvents() {
+                const isSTEM = document.getElementById('isSTEM');
+                if (isSTEM) {
+                    isSTEM.addEventListener('change', (e) => this.handleSTEMChange(e));
+                }
+            }
+
+            handleSTEMChange(e) {
+                const stemOptEndGroup = document.getElementById('stemOptEndGroup');
+                if (stemOptEndGroup) {
+                    const isSTEM = e.target.value === 'yes';
+                    stemOptEndGroup.style.display = isSTEM ? 'block' : 'none';
+                    this.log(`STEM extension changed to: ${isSTEM ? 'Yes' : 'No'}`);
+                    
+                    if (!isSTEM) {
+                        this.selectedStemDate = null;
+                        const stemOptEndDate = document.getElementById('stemOptEndDate');
+                        if (stemOptEndDate) stemOptEndDate.value = '';
+                        this.updateSTEMDateDisplay();
+                    }
+                }
+            }
+
+            initSTEMDatePicker() {
+                const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+                const stemCustomPicker = document.getElementById('stemCustomDatePicker');
+                
+                if (!stemDateTriggerBtn || !stemCustomPicker) {
+                    this.log('⚠️ STEM date picker elements not found');
+                    return;
+                }
+
+                this.log('✅ STEM date picker elements found');
+
+                // Show/hide STEM date picker
+                stemDateTriggerBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.log('🎯 STEM date picker button clicked');
+                    
+                    const isActive = stemCustomPicker.classList.contains('active');
+                    this.log(`📅 STEM picker active state: ${isActive}`);
+                    
+                    if (!isActive) {
+                        stemCustomPicker.classList.add('active');
+                        stemDateTriggerBtn.setAttribute('aria-expanded', 'true');
+                        this.log('🔓 Opening STEM date picker');
+                        this.renderSTEMCustomCalendar();
+                    } else {
+                        stemCustomPicker.classList.remove('active');
+                        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+                        this.log('🔒 Closing STEM date picker');
+                    }
+                });
+
+                // Close STEM picker when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (stemCustomPicker.classList.contains('active') && 
+                        !stemCustomPicker.contains(e.target) && 
+                        !stemDateTriggerBtn.contains(e.target)) {
+                        stemCustomPicker.classList.remove('active');
+                        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+                        this.log('🔒 Closing STEM picker (clicked outside)');
+                    }
+                });
+
+                // STEM Navigation buttons
+                const stemPrevBtn = document.getElementById('stemPrevMonth');
+                const stemNextBtn = document.getElementById('stemNextMonth');
+                const stemTodayBtn = document.getElementById('stemTodayBtn');
+                const stemClearBtn = document.getElementById('stemClearBtn');
+                
+                if (stemPrevBtn) {
+                    stemPrevBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.stemCurrentDate.setMonth(this.stemCurrentDate.getMonth() - 1);
+                        this.renderSTEMCustomCalendar();
+                    });
+                }
+                
+                if (stemNextBtn) {
+                    stemNextBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.stemCurrentDate.setMonth(this.stemCurrentDate.getMonth() + 1);
+                        this.renderSTEMCustomCalendar();
+                    });
+                }
+
+                if (stemTodayBtn) {
+                    stemTodayBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.stemCurrentDate = new Date();
+                        this.renderSTEMCustomCalendar();
+                    });
+                }
+
+                if (stemClearBtn) {
+                    stemClearBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.selectedStemDate = null;
+                        const stemOptEndDate = document.getElementById('stemOptEndDate');
+                        if (stemOptEndDate) stemOptEndDate.value = '';
+                        stemCustomPicker.classList.remove('active');
+                        this.updateSTEMDateDisplay();
+                    });
+                }
+            }
+
+            renderSTEMCustomCalendar() {
+                this.log('🎨 Rendering STEM custom calendar...');
+                const monthSpan = document.getElementById('stemCurrentMonth');
+                const daysContainer = document.getElementById('stemPickerDays');
+                
+                if (!monthSpan || !daysContainer) {
+                    this.log('⚠️ STEM calendar elements not found');
+                    return;
+                }
+                
+                const year = this.stemCurrentDate.getFullYear();
+                const month = this.stemCurrentDate.getMonth();
+                
+                monthSpan.textContent = this.stemCurrentDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+                
+                // Clear previous days
+                daysContainer.innerHTML = '';
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+                
+                // Render calendar grid (6 weeks x 7 days = 42 days)
+                for (let i = 0; i < 42; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'picker-day';
+                    dayElement.textContent = date.getDate();
+                    
+                    // Add appropriate classes
+                    if (date.getMonth() !== month) {
+                        dayElement.classList.add('other-month');
+                    }
+                    
+                    if (this.isToday(date)) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    if (this.selectedStemDate && this.isSameDate(date, this.selectedStemDate)) {
+                        dayElement.classList.add('selected');
+                    }
+                    
+                    // Add click event
+                    dayElement.addEventListener('click', () => {
+                        if (date.getMonth() === month) {
+                            // Remove previous selection
+                            const prevSelected = daysContainer.querySelector('.picker-day.selected');
+                            if (prevSelected) prevSelected.classList.remove('selected');
+                            
+                            // Add selection to clicked date
+                            dayElement.classList.add('selected');
+                            
+                            this.selectedStemDate = date;
+                            this.updateSTEMDateInput(this.selectedStemDate);
+                            this.updateSTEMDateTriggerButton(date);
+                            
+                            // Close picker
+                            setTimeout(() => {
+                                const stemCustomPicker = document.getElementById('stemCustomDatePicker');
+                                if (stemCustomPicker) stemCustomPicker.classList.remove('active');
+                            }, 150);
+                        }
+                    });
+                    
+                    daysContainer.appendChild(dayElement);
+                }
+            }
+
+            isToday(date) {
+                const today = new Date();
+                return this.isSameDate(date, today);
+            }
+
+            isSameDate(date1, date2) {
+                return date1.getDate() === date2.getDate() &&
+                       date1.getMonth() === date2.getMonth() &&
+                       date1.getFullYear() === date2.getFullYear();
+            }
+
+            updateSTEMDateInput(date) {
+                const formattedDate = date.toISOString().split('T')[0];
+                const stemOptEndDate = document.getElementById('stemOptEndDate');
+                
+                if (stemOptEndDate) stemOptEndDate.value = formattedDate;
+                this.log(`📅 STEM date selected: ${formattedDate}`);
+            }
+            
+            updateSTEMDateTriggerButton(date) {
+                const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+                if (stemDateTriggerBtn) {
+                    const btnText = stemDateTriggerBtn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = date.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                        stemDateTriggerBtn.classList.add('selected');
+                    }
+                }
+            }
+            
+            updateSTEMDateDisplay() {
+                const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+                if (stemDateTriggerBtn) {
+                    const btnText = stemDateTriggerBtn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = 'Choose OPT End Date';
+                        stemDateTriggerBtn.classList.remove('selected');
+                    }
+                }
+            }
+
+            log(message) {
+                const debugOutput = document.getElementById('debugOutput');
+                if (debugOutput) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    debugOutput.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+                    debugOutput.scrollTop = debugOutput.scrollHeight;
+                }
+                console.log(message);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new STEMDatePickerTest();
+        });
+    </script>
+</body>
+</html> 

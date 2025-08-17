@@ -97,8 +97,12 @@
                     </div>
                     
                     <form id="plannerForm" class="planner-form">
-                        <div class="form-group">
-                            <label for="graduationDate">Graduation Date</label>
+                        <div class="form-group" id="graduationDateGroup">
+                            <label for="graduationDate">
+                                <span class="label-icon">🎓</span>
+                                Graduation Date
+                                <span class="help-text">(For standard OPT planning - not needed for STEM extension)</span>
+                            </label>
                             <div class="date-input-wrapper">
                                 <div class="custom-date-picker" id="customDatePicker">
                                     <div class="picker-header">
@@ -121,11 +125,14 @@
                                         <button type="button" class="picker-btn clear-btn" id="clearBtn">Clear</button>
                                     </div>
                                 </div>
-                                <input type="date" id="graduationDate" required style="display: none;">
+                                <input type="date" id="graduationDate" style="position: absolute; left: -9999px; opacity: 0;">
                                 <button type="button" class="date-trigger-btn" id="dateTriggerBtn" aria-label="Open date picker to choose graduation date" aria-haspopup="true" aria-expanded="false">
                                     <span class="btn-icon">📊</span>
                                     <span class="btn-text">Choose Graduation Date</span>
                                 </button>
+                                <div id="selectedDateDisplay" style="margin-top: 8px; font-size: 12px; color: #888; display: none;">
+                                    Selected: <span id="selectedDateText">-</span>
+                                </div>
                             </div>
                         </div>
                         
@@ -159,19 +166,33 @@
                                 <span class="help-text">(When your current OPT expires - for STEM extension planning)</span>
                             </label>
                             <div class="date-input-wrapper">
-                                <!-- Simple date display -->
-                                <div class="date-display" id="stemDateDisplay">
-                                    <span class="date-text">Select OPT End Date</span>
-                                    <button type="button" class="date-picker-btn" id="openStemDatePicker">
-                                        <span class="btn-icon">📊</span>
-                                        Choose Date
-                                    </button>
+                                <div class="custom-date-picker" id="stemCustomDatePicker">
+                                    <div class="picker-header">
+                                        <button type="button" class="picker-nav" id="stemPrevMonth" aria-label="Previous month">‹</button>
+                                        <span class="current-month" id="stemCurrentMonth">December 2024</span>
+                                        <button type="button" class="picker-nav" id="stemNextMonth" aria-label="Next month">›</button>
+                                        <button type="button" class="picker-close" id="stemCloseBtn" aria-label="Close date picker">✕</button>
+                                    </div>
+                                    <div class="picker-days-header">
+                                        <span>Sun</span>
+                                        <span>Mon</span>
+                                        <span>Tue</span>
+                                        <span>Wed</span>
+                                        <span>Thu</span>
+                                        <span>Fri</span>
+                                        <span>Sat</span>
+                                    </div>
+                                    <div class="picker-days" id="stemPickerDays"></div>
+                                    <div class="picker-actions">
+                                        <button type="button" class="picker-btn today-btn" id="stemTodayBtn">Today</button>
+                                        <button type="button" class="picker-btn clear-btn" id="stemClearBtn">Clear</button>
+                                    </div>
                                 </div>
-                                
-                                <!-- Hidden input for form submission -->
-                                <input type="hidden" id="stemOptEndDate">
-                                
-
+                                <button type="button" class="date-trigger-btn" id="stemDateTriggerBtn" aria-label="Open date picker to choose OPT end date" aria-haspopup="true" aria-expanded="false">
+                                    <span class="btn-icon">📊</span>
+                                    <span class="btn-text">Choose OPT End Date</span>
+                                </button>
+                                <input type="date" id="stemOptEndDate" style="position: absolute; left: -9999px; opacity: 0;">
                             </div>
                         </div>
                         

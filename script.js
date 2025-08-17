@@ -1,7 +1,9 @@
 class OPTPlanner {
   constructor() {
     this.selectedDate = null;
+    this.selectedStemDate = null;
     this.currentDate = new Date();
+    this.stemCurrentDate = new Date();
     this.init();
   }
 
@@ -23,13 +25,22 @@ class OPTPlanner {
     }
 
     const graduationDate = document.getElementById('graduationDate');
-        if (graduationDate) {
+    if (graduationDate) {
       graduationDate.addEventListener('change', (e) => this.handleDateChange(e));
     }
 
     const isSTEM = document.getElementById('isSTEM');
     if (isSTEM) {
       isSTEM.addEventListener('change', (e) => this.handleSTEMChange(e));
+    }
+
+    // Add direct click handler to Calculate Timeline button as backup
+    const calculateBtn = document.querySelector('button[type="submit"]');
+    if (calculateBtn) {
+      calculateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleCalculateClick();
+      });
     }
   }
 
@@ -106,6 +117,119 @@ class OPTPlanner {
         this.updateDateDisplay();
       });
     }
+
+    // Initialize STEM date picker
+    this.initSTEMDatePicker();
+  }
+
+  initSTEMDatePicker() {
+    const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+    const stemCustomPicker = document.getElementById('stemCustomDatePicker');
+    
+    if (!stemDateTriggerBtn || !stemCustomPicker) {
+      return;
+    }
+
+    // Show/hide STEM date picker
+    stemDateTriggerBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const isActive = stemCustomPicker.classList.contains('active');
+      
+      if (!isActive) {
+        stemCustomPicker.classList.add('active');
+        stemDateTriggerBtn.setAttribute('aria-expanded', 'true');
+        this.renderSTEMCustomCalendar();
+      } else {
+        stemCustomPicker.classList.remove('active');
+        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close STEM picker when clicking outside
+    document.addEventListener('click', (e) => {
+      if (stemCustomPicker.classList.contains('active') && 
+          !stemCustomPicker.contains(e.target) && 
+          !stemDateTriggerBtn.contains(e.target)) {
+        stemCustomPicker.classList.remove('active');
+        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close STEM picker when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && stemCustomPicker.classList.contains('active')) {
+        stemCustomPicker.classList.remove('active');
+        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Keyboard navigation support for STEM picker
+    document.addEventListener('keydown', (e) => {
+      if (stemCustomPicker.classList.contains('active')) {
+        if (e.key === 'Escape') {
+          stemCustomPicker.classList.remove('active');
+          stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    // STEM Navigation buttons
+    const stemPrevBtn = document.getElementById('stemPrevMonth');
+    const stemNextBtn = document.getElementById('stemNextMonth');
+    const stemTodayBtn = document.getElementById('stemTodayBtn');
+    const stemClearBtn = document.getElementById('stemClearBtn');
+    
+    if (stemPrevBtn) {
+      stemPrevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.stemCurrentDate.setMonth(this.stemCurrentDate.getMonth() - 1);
+        this.renderSTEMCustomCalendar();
+      });
+    }
+    
+    if (stemNextBtn) {
+      stemNextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.stemCurrentDate.setMonth(this.stemCurrentDate.getMonth() + 1);
+        this.renderSTEMCustomCalendar();
+      });
+    }
+
+    if (stemTodayBtn) {
+      stemTodayBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.stemCurrentDate = new Date();
+        this.renderSTEMCustomCalendar();
+      });
+    }
+
+    if (stemClearBtn) {
+      stemClearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectedStemDate = null;
+        const stemOptEndDate = document.getElementById('stemOptEndDate');
+        if (stemOptEndDate) stemOptEndDate.value = '';
+        stemCustomPicker.classList.remove('active');
+        this.updateSTEMDateDisplay();
+      });
+    }
+
+    // Add close button functionality
+    const stemCloseBtn = document.getElementById('stemCloseBtn');
+    if (stemCloseBtn) {
+      stemCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        stemCustomPicker.classList.remove('active');
+        stemDateTriggerBtn.setAttribute('aria-expanded', 'false');
+      });
+    }
   }
 
   initUSCISRedirect() {
@@ -154,23 +278,50 @@ class OPTPlanner {
 
   handleFormSubmit(e) {
     e.preventDefault();
+    this.handleCalculateClick();
+  }
+
+  handleCalculateClick() {
     const graduationDate = document.getElementById('graduationDate');
     const isSTEM = document.getElementById('isSTEM');
+    const stemOptEndDate = document.getElementById('stemOptEndDate');
     
-    if (!graduationDate || !isSTEM) {
-      console.error('❌ Required form elements not found');
+    if (!isSTEM) {
       return;
     }
 
-    const date = new Date(graduationDate.value);
     const stemExtension = isSTEM.value === 'yes';
     
-    if (isNaN(date.getTime())) {
-      alert('Please select a valid graduation date');
-      return;
+    if (stemExtension) {
+      // For STEM extension: Use OPT end date to calculate STEM filing window
+      if (!stemOptEndDate || !stemOptEndDate.value) {
+        alert('Please select your current OPT end date for STEM extension planning');
+        return;
+      }
+      
+      const optEndDate = new Date(stemOptEndDate.value);
+      if (isNaN(optEndDate.getTime())) {
+        alert('Please select a valid OPT end date');
+        return;
+      }
+      
+      this.calculateSTEMTimeline(optEndDate);
+      
+    } else {
+      // For standard OPT: Use graduation date
+      if (!graduationDate || !graduationDate.value) {
+        alert('Please select a graduation date for standard OPT planning');
+        return;
+      }
+      
+      const date = new Date(graduationDate.value);
+      if (isNaN(date.getTime())) {
+        alert('Please select a valid graduation date');
+        return;
+      }
+      
+      this.calculateTimeline(date, false);
     }
-
-    this.calculateTimeline(date, stemExtension);
   }
 
   handleDateChange(e) {
@@ -182,8 +333,28 @@ class OPTPlanner {
 
   handleSTEMChange(e) {
     const stemOptEndGroup = document.getElementById('stemOptEndGroup');
-    if (stemOptEndGroup) {
-      stemOptEndGroup.style.display = e.target.value === 'yes' ? 'block' : 'none';
+    const graduationDateGroup = document.getElementById('graduationDateGroup');
+    
+    if (stemOptEndGroup && graduationDateGroup) {
+      const isSTEM = e.target.value === 'yes';
+      
+      // Show/hide STEM OPT end date group
+      stemOptEndGroup.style.display = isSTEM ? 'block' : 'none';
+      
+      // Show/hide graduation date group (only needed for standard OPT)
+      graduationDateGroup.style.display = isSTEM ? 'none' : 'block';
+      
+      // Clear STEM date if switching from STEM to standard
+      if (!isSTEM) {
+        this.selectedStemDate = null;
+        const stemOptEndDate = document.getElementById('stemOptEndDate');
+        if (stemOptEndDate) stemOptEndDate.value = '';
+        this.updateSTEMDateDisplay();
+        
+        // Hide STEM timeline
+        const stemTimeline = document.getElementById('stemTimeline');
+        if (stemTimeline) stemTimeline.classList.add('hidden');
+      }
     }
   }
 
@@ -204,7 +375,9 @@ class OPTPlanner {
 
   calculateTimeline(graduationDate, stemExtension) {
     const results = document.getElementById('timelineResults');
-    if (!results) return;
+    if (!results) {
+      return;
+    }
 
     // Calculate key dates
     const earliestFiling = new Date(graduationDate);
@@ -214,8 +387,30 @@ class OPTPlanner {
     latestFiling.setDate(latestFiling.getDate() + 60);
 
     const optStart = new Date(graduationDate);
-    const optEnd = new Date(graduationDate);
-    optEnd.setDate(optEnd.getDate() + (stemExtension ? 365 + 730 : 365));
+    let optEnd = new Date(graduationDate);
+    
+    // Calculate OPT duration: 12 months for standard, 36 months total for STEM (12 + 24)
+    if (stemExtension) {
+      // For STEM: 12 months standard OPT + 24 months extension = 36 months total
+      optEnd.setDate(optEnd.getDate() + (12 * 30) + (24 * 30)); // Approximate months to days
+      
+      // If STEM OPT end date is provided, use that for more accurate STEM filing window
+      const stemOptEndDate = document.getElementById('stemOptEndDate');
+      if (stemOptEndDate && stemOptEndDate.value) {
+        const stemEndDate = new Date(stemOptEndDate.value);
+        if (!isNaN(stemEndDate.getTime())) {
+          // Calculate STEM filing window based on actual OPT end date
+          const stemFilingStart = new Date(stemEndDate);
+          stemFilingStart.setDate(stemFilingStart.getDate() - 90);
+          
+          console.log('📅 STEM OPT End Date provided:', stemEndDate.toLocaleDateString());
+          console.log('📅 STEM Filing Window:', stemFilingStart.toLocaleDateString(), 'to', stemEndDate.toLocaleDateString());
+        }
+      }
+    } else {
+      // For standard OPT: 12 months
+      optEnd.setDate(optEnd.getDate() + (12 * 30)); // Approximate months to days
+    }
 
     const stemFilingStart = new Date(optEnd);
     stemFilingStart.setDate(stemFilingStart.getDate() - 90);
@@ -224,17 +419,6 @@ class OPTPlanner {
     const today = new Date();
     const daysUntilEarliest = Math.ceil((earliestFiling - today) / (1000 * 60 * 60 * 24));
     const daysUntilLatest = Math.ceil((latestFiling - today) / (1000 * 60 * 60 * 24));
-    
-    // Debug logging
-    console.log('📅 Timeline Calculation:', {
-      graduationDate: graduationDate.toLocaleDateString(),
-      earliestFiling: earliestFiling.toLocaleDateString(),
-      latestFiling: latestFiling.toLocaleDateString(),
-      optStart: optStart.toLocaleDateString(),
-      today: today.toLocaleDateString(),
-      daysUntilEarliest,
-      daysUntilLatest
-    });
 
     // Update display
     this.updateTimelineDisplay({
@@ -249,6 +433,133 @@ class OPTPlanner {
     });
 
     results.classList.remove('hidden');
+  }
+
+  calculateSTEMTimeline(optEndDate) {
+    const results = document.getElementById('timelineResults');
+    if (!results) {
+      return;
+    }
+    
+    // Calculate STEM extension timeline based on OPT end date
+    const stemFilingStart = new Date(optEndDate);
+    stemFilingStart.setDate(stemFilingStart.getDate() - 90); // 90 days before OPT expires
+    
+    const stemExtensionEnd = new Date(optEndDate);
+    stemExtensionEnd.setDate(stemExtensionEnd.getDate() + (24 * 30)); // Add 24 months
+    
+    // Calculate days remaining
+    const today = new Date();
+    const daysUntilStemFiling = Math.ceil((stemFilingStart - today) / (1000 * 60 * 60 * 24));
+    const daysUntilOptExpires = Math.ceil((optEndDate - today) / (1000 * 60 * 60 * 24));
+    
+    // Update display
+    this.updateSTEMTimelineDisplay({
+      optEndDate,
+      stemFilingStart,
+      stemExtensionEnd,
+      daysUntilStemFiling,
+      daysUntilOptExpires
+    });
+    
+    results.classList.remove('hidden');
+  }
+
+  updateSTEMTimelineDisplay(dates) {
+    
+    // Update timeline dates for STEM extension
+    const earliestFiling = document.getElementById('earliestFiling');
+    const latestFiling = document.getElementById('latestFiling');
+    const startWindow = document.getElementById('startWindow');
+    const startWindowText = document.getElementById('startWindowText');
+    const optDuration = document.getElementById('optDuration');
+    const optDurationText = document.getElementById('optDurationText');
+
+    if (earliestFiling) earliestFiling.textContent = dates.stemFilingStart.toLocaleDateString();
+    if (latestFiling) latestFiling.textContent = dates.optEndDate.toLocaleDateString();
+    
+    // Update OPT Start Window - for STEM, this is the current OPT end date
+    if (startWindow) {
+      startWindow.textContent = dates.optEndDate.toLocaleDateString();
+    }
+    if (startWindowText) {
+      startWindowText.textContent = `Your current OPT end date`;
+    }
+    
+    // Update OPT Duration - STEM extension adds 24 months
+    if (optDuration) {
+      optDuration.textContent = '24 months (STEM extension)';
+    }
+    if (optDurationText) {
+      optDurationText.textContent = `Additional time with STEM extension: 24 months`;
+    }
+
+    // Update Time Remaining countdown for STEM filing
+    const daysUntilEarliest = document.getElementById('daysUntilEarliest');
+    const daysUntilLatest = document.getElementById('daysUntilLatest');
+    
+    if (daysUntilEarliest) {
+      if (dates.daysUntilStemFiling > 0) {
+        daysUntilEarliest.textContent = dates.daysUntilStemFiling;
+      } else if (dates.daysUntilStemFiling === 0) {
+        daysUntilEarliest.textContent = 'Today!';
+      } else {
+        daysUntilEarliest.textContent = 'Past due';
+      }
+    }
+    
+    if (daysUntilLatest) {
+      if (dates.daysUntilOptExpires > 0) {
+        daysUntilLatest.textContent = dates.daysUntilOptExpires;
+      } else if (dates.daysUntilOptExpires === 0) {
+        daysUntilLatest.textContent = 'Today!';
+      } else {
+        daysUntilLatest.textContent = 'Past due';
+      }
+    }
+    
+    // Update current time display
+    const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+    if (currentTimeDisplay) {
+      const now = new Date();
+      const timeString = now.toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      });
+      currentTimeDisplay.textContent = timeString;
+    }
+
+    // Show STEM timeline section
+    const stemTimeline = document.getElementById('stemTimeline');
+    if (stemTimeline) {
+      stemTimeline.classList.remove('hidden');
+      
+      // Update STEM timeline dates
+      const stemFilingWindow = document.getElementById('stemFilingWindow');
+      const totalOptPeriod = document.getElementById('totalOptPeriod');
+      
+      if (stemFilingWindow) {
+        stemFilingWindow.textContent = `${dates.stemFilingStart.toLocaleDateString()} - ${dates.optEndDate.toLocaleDateString()}`;
+      }
+      
+      if (totalOptPeriod) {
+        totalOptPeriod.textContent = '24 months (STEM extension)';
+      }
+    }
+
+    // Update calendar buttons with STEM dates
+    this.updateCalendarButtons({
+      earliestFiling: dates.stemFilingStart,
+      latestFiling: dates.optEndDate,
+      optStart: dates.optEndDate,
+      optEnd: dates.stemExtensionEnd,
+      stemExtension: true
+    });
   }
 
   updateTimelineDisplay(dates) {
@@ -334,6 +645,28 @@ class OPTPlanner {
       stemOptEndGroup.style.display = dates.stemExtension ? 'block' : 'none';
     }
 
+    // Show/hide STEM timeline section
+    const stemTimeline = document.getElementById('stemTimeline');
+    if (stemTimeline) {
+      if (dates.stemExtension) {
+        stemTimeline.classList.remove('hidden');
+        
+        // Update STEM timeline dates
+        const stemFilingWindow = document.getElementById('stemFilingWindow');
+        const totalOptPeriod = document.getElementById('totalOptPeriod');
+        
+        if (stemFilingWindow) {
+          stemFilingWindow.textContent = `${dates.stemFilingStart.toLocaleDateString()} - ${dates.optEnd.toLocaleDateString()}`;
+        }
+        
+        if (totalOptPeriod) {
+          totalOptPeriod.textContent = '36 months (12 + 24)';
+        }
+      } else {
+        stemTimeline.classList.add('hidden');
+      }
+    }
+
     // Update calendar buttons with dates
     this.updateCalendarButtons(dates);
   }
@@ -394,6 +727,7 @@ class OPTPlanner {
           dayElement.classList.add('selected');
           
           this.selectedDate = date;
+          console.log('📅 Date selected:', date.toLocaleDateString());
           this.updateDateInput(this.selectedDate);
           
           // Update the trigger button text
@@ -409,6 +743,82 @@ class OPTPlanner {
       
       daysContainer.appendChild(dayElement);
     }
+  }
+
+  renderSTEMCustomCalendar() {
+    const monthSpan = document.getElementById('stemCurrentMonth');
+    const daysContainer = document.getElementById('stemPickerDays');
+    
+    if (!monthSpan || !daysContainer) {
+      return;
+    }
+    
+    const year = this.stemCurrentDate.getFullYear();
+    const month = this.stemCurrentDate.getMonth();
+    
+    monthSpan.textContent = this.stemCurrentDate.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    // Clear previous days
+    daysContainer.innerHTML = '';
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    // Render calendar grid (6 weeks x 7 days = 42 days)
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      
+      const dayElement = document.createElement('div');
+      dayElement.className = 'picker-day';
+      dayElement.textContent = date.getDate();
+      
+      // Add appropriate classes
+      if (date.getMonth() !== month) {
+        dayElement.classList.add('other-month');
+      }
+      
+      if (this.isToday(date)) {
+        dayElement.classList.add('today');
+      }
+      
+      if (this.selectedStemDate && this.isSameDate(date, this.selectedStemDate)) {
+        dayElement.classList.add('selected');
+      }
+      
+      // Add click event with better visual feedback
+      dayElement.addEventListener('click', () => {
+        if (date.getMonth() === month) {
+          // Remove previous selection
+          const prevSelected = daysContainer.querySelector('.picker-day.selected');
+          if (prevSelected) prevSelected.classList.remove('selected');
+          
+          // Add selection to clicked date
+          dayElement.classList.add('selected');
+          
+          this.selectedStemDate = date;
+          this.updateSTEMDateInput(this.selectedStemDate);
+          
+          // Update the trigger button text
+          this.updateSTEMDateTriggerButton(date);
+          
+          // Close picker with smooth animation
+          setTimeout(() => {
+            const stemCustomPicker = document.getElementById('stemCustomDatePicker');
+            if (stemCustomPicker) stemCustomPicker.classList.remove('active');
+          }, 150);
+        }
+      });
+      
+      daysContainer.appendChild(dayElement);
+    }
+
   }
 
   isToday(date) {
@@ -427,7 +837,22 @@ class OPTPlanner {
     const graduationDate = document.getElementById('graduationDate');
     
     // Update hidden input
-    if (graduationDate) graduationDate.value = formattedDate;
+    if (graduationDate) {
+      graduationDate.value = formattedDate;
+    }
+
+    // Update visual display
+    const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+    const selectedDateText = document.getElementById('selectedDateText');
+    if (selectedDateDisplay && selectedDateText) {
+      selectedDateText.textContent = date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      selectedDateDisplay.style.display = 'block';
+    }
   }
   
   updateDateTriggerButton(date) {
@@ -450,6 +875,46 @@ class OPTPlanner {
       const btnText = dateTriggerBtn.querySelector('.btn-text');
       if (btnText) {
         btnText.textContent = 'Choose Graduation Date';
+      }
+    }
+
+    // Hide the selected date display
+    const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+    if (selectedDateDisplay) {
+      selectedDateDisplay.style.display = 'none';
+    }
+  }
+
+  updateSTEMDateInput(date) {
+    const formattedDate = date.toISOString().split('T')[0];
+    const stemOptEndDate = document.getElementById('stemOptEndDate');
+    
+    // Update hidden input
+    if (stemOptEndDate) stemOptEndDate.value = formattedDate;
+  }
+  
+  updateSTEMDateTriggerButton(date) {
+    const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+    if (stemDateTriggerBtn) {
+      const btnText = stemDateTriggerBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        stemDateTriggerBtn.classList.add('selected');
+      }
+    }
+  }
+  
+  updateSTEMDateDisplay() {
+    const stemDateTriggerBtn = document.getElementById('stemDateTriggerBtn');
+    if (stemDateTriggerBtn) {
+      const btnText = stemDateTriggerBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'Choose OPT End Date';
+        stemDateTriggerBtn.classList.remove('selected');
       }
     }
   }

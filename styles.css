@@ -1227,6 +1227,28 @@ body {
   transform: translateY(0);
 }
 
+.picker-close {
+  background: var(--accent-danger, #dc3545);
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.picker-close:hover {
+  background: var(--accent-danger-hover, #c82333);
+  transform: scale(1.1);
+}
+
 .current-month {
   font-size: 1.25rem;
   font-weight: 700;
@@ -3508,4 +3530,108 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   .calendar-option .option-text {
     font-size: 0.9rem;
   }
+}
+
+/* STEM Date Picker Specific Styles */
+#stemCustomDatePicker {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 20px;
+  min-width: 300px;
+  display: none;
+  margin: 0;
+  overflow: visible;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#stemCustomDatePicker.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Add backdrop overlay when STEM date picker is active */
+#stemCustomDatePicker.active::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Ensure STEM date picker is above other elements */
+#stemOptEndGroup {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Ensure the date input wrapper doesn't interfere with positioning */
+#stemOptEndGroup .date-input-wrapper {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Additional STEM date picker visibility fixes - Higher specificity */
+body #stemCustomDatePicker {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+  background: var(--bg-panel) !important;
+  border: 2px solid var(--accent-primary) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+}
+
+/* Debug: Ensure no other elements block the STEM picker */
+#stemOptEndGroup {
+  overflow: visible !important;
+}
+
+.date-input-wrapper {
+  overflow: visible !important;
+}
+
+#stemCustomDatePicker .picker-header,
+#stemCustomDatePicker .picker-days-header,
+#stemCustomDatePicker .picker-days,
+#stemCustomDatePicker .picker-actions {
+  position: relative;
+  z-index: 10001;
+}
+
+/* STEM Date Picker Button */
+#stemDateTriggerBtn {
+  width: 100%;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+#stemDateTriggerBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+}
+
+#stemDateTriggerBtn.selected {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
 }
