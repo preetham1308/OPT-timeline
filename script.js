@@ -639,11 +639,30 @@ class OPTPlanner {
   initUSCISIntegration() {
     console.log('🔧 Initializing USCIS Integration...');
     
+    // Test if we can find the elements
     const uscisForm = document.getElementById('uscisForm');
     const testSandboxBtn = document.getElementById('testSandboxBtn');
+    const receiptInput = document.getElementById('receiptNumber');
     
     console.log('📋 USCIS Form found:', uscisForm);
     console.log('🧪 Test Sandbox Button found:', testSandboxBtn);
+    console.log('📝 Receipt Input found:', receiptInput);
+    
+    // Test if elements exist in DOM
+    if (!uscisForm) {
+      console.error('❌ USCIS Form not found!');
+      return;
+    }
+    
+    if (!testSandboxBtn) {
+      console.error('❌ Test Sandbox Button not found!');
+      return;
+    }
+    
+    if (!receiptInput) {
+      console.error('❌ Receipt Input not found!');
+      return;
+    }
     
     // USCIS API Configuration
     this.uscisConfig = {
@@ -662,30 +681,33 @@ class OPTPlanner {
     console.log('⚙️ USCIS Config loaded:', this.uscisConfig);
     
     // Handle form submission
-    if (uscisForm) {
-      uscisForm.addEventListener('submit', (e) => {
-        console.log('📝 USCIS Form submitted');
-        e.preventDefault();
-        const receiptNumber = document.getElementById('receiptNumber').value.trim();
-        console.log('🔍 Receipt Number:', receiptNumber);
-        if (receiptNumber) {
-          this.checkUSCISStatus(receiptNumber);
-        }
-      });
-    }
+    uscisForm.addEventListener('submit', (e) => {
+      console.log('📝 USCIS Form submitted');
+      e.preventDefault();
+      const receiptNumber = receiptInput.value.trim();
+      console.log('🔍 Receipt Number:', receiptNumber);
+      if (receiptNumber) {
+        this.checkUSCISStatus(receiptNumber);
+      }
+    });
     
     // Test sandbox button
-    if (testSandboxBtn) {
-      testSandboxBtn.addEventListener('click', () => {
-        console.log('🧪 Test Sandbox Button clicked');
-        const randomCase = this.uscisConfig.sandboxCases[
-          Math.floor(Math.random() * this.uscisConfig.sandboxCases.length)
-        ];
-        console.log('🎲 Random test case:', randomCase);
-        document.getElementById('receiptNumber').value = randomCase;
-        this.checkUSCISStatus(randomCase);
-      });
-    }
+    testSandboxBtn.addEventListener('click', () => {
+      console.log('🧪 Test Sandbox Button clicked');
+      const randomCase = this.uscisConfig.sandboxCases[
+        Math.floor(Math.random() * this.uscisConfig.sandboxCases.length)
+      ];
+      console.log('🎲 Random test case:', randomCase);
+      receiptInput.value = randomCase;
+      this.checkUSCISStatus(randomCase);
+    });
+    
+    // Test if we can manually trigger a click
+    console.log('🧪 Testing button click manually...');
+    setTimeout(() => {
+      console.log('🔄 Testing manual click in 2 seconds...');
+      testSandboxBtn.click();
+    }, 2000);
     
     console.log('✅ USCIS Integration initialized');
   }
