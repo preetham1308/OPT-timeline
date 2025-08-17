@@ -1,35 +1,64 @@
 class OPTPlanner {
   constructor() {
-    this.form = document.getElementById('plannerForm');
-    this.timelineResults = document.getElementById('timelineResults');
-    this.loadingOverlay = document.getElementById('loadingOverlay');
-    this.stemOptEndGroup = document.getElementById('stemOptEndGroup');
-    this.stemTimeline = document.getElementById('stemTimeline');
-    
-    // Custom date picker properties
-    this.currentDate = new Date();
-    this.selectedDate = null;
-    
-    this.init();
+    try {
+      this.form = document.getElementById('plannerForm');
+      this.timelineResults = document.getElementById('timelineResults');
+      this.loadingOverlay = document.getElementById('loadingOverlay');
+      this.stemOptEndGroup = document.getElementById('stemOptEndGroup');
+      this.stemTimeline = document.getElementById('stemTimeline');
+      
+      // Custom date picker properties
+      this.currentDate = new Date();
+      this.selectedDate = null;
+      
+      this.init();
+    } catch (error) {
+      console.warn('OPTPlanner initialization warning:', error.message);
+      // Continue with basic functionality even if some elements are missing
+    }
   }
 
   init() {
-    this.bindEvents();
-    this.setDefaultDates();
-    this.animateNumbersOnLoad();
-    this.addMobileEnhancements();
-    this.initUSCISIntegration();
+    try {
+      this.bindEvents();
+      this.setDefaultDates();
+      this.animateNumbersOnLoad();
+      this.addMobileEnhancements();
+      this.initUSCISIntegration();
+    } catch (error) {
+      console.warn('OPTPlanner init warning:', error.message);
+      // Try to initialize USCIS integration even if other parts fail
+      try {
+        this.initUSCISIntegration();
+      } catch (uscisError) {
+        console.warn('USCIS integration warning:', uscisError.message);
+      }
+    }
   }
 
   bindEvents() {
-    this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
-    
-    // Auto-calculate on date changes
-    document.getElementById('graduationDate').addEventListener('change', () => this.autoCalculate());
-    document.getElementById('isSTEM').addEventListener('change', () => this.handleSTEMChange());
-    
-    // Date preset buttons
-    this.bindDatePresets();
+    try {
+      if (this.form) {
+        this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+      }
+      
+      // Auto-calculate on date changes
+      const graduationDate = document.getElementById('graduationDate');
+      const isSTEM = document.getElementById('isSTEM');
+      
+      if (graduationDate) {
+        graduationDate.addEventListener('change', () => this.autoCalculate());
+      }
+      
+      if (isSTEM) {
+        isSTEM.addEventListener('change', () => this.handleSTEMChange());
+      }
+      
+      // Date preset buttons
+      this.bindDatePresets();
+    } catch (error) {
+      console.warn('OPTPlanner bindEvents warning:', error.message);
+    }
   }
 
   bindDatePresets() {
@@ -671,10 +700,33 @@ class OPTPlanner {
         caseStatusUrl: '/case-status',
         accessTokenUrl: '/oauth/accesstoken'
       },
+      production: {
+        baseUrl: 'https://api.uscis.gov',
+        caseStatusUrl: '/case-status',
+        accessTokenUrl: '/oauth/accesstoken'
+      },
+      // ⚠️ SECURITY WARNING: Credentials should NEVER be in client-side code
+      // These are exposed in network tab and can be stolen by anyone
+      // Use server-side proxy instead
+      credentials: {
+        // REMOVED FOR SECURITY - Use server-side proxy
+        clientId: null,
+        clientSecret: null
+      },
+      // Staging receipt numbers for testing
       sandboxCases: [
-        'EAC9999103403', 'EAC9999103404', 'EAC9999103405',
-        'SRC9999102777', 'SRC9999102778', 'SRC9999102779',
-        'LIN9999106498', 'LIN9999106499', 'LIN9999106504'
+        // With hist_case_data in payloads
+        'EAC9999103403', 'EAC9999103404', 'EAC9999103405', 'EAC9999103410', 'EAC9999103411', 
+        'EAC9999103416', 'EAC9999103419', 'LIN9999106498', 'LIN9999106499', 'LIN9999106504', 
+        'LIN9999106505', 'LIN9999106506', 'SRC9999102777', 'SRC9999102778', 'SRC9999102779', 
+        'SRC9999102780', 'SRC9999102781', 'SRC9999102782', 'SRC9999102783', 'SRC9999102784', 
+        'SRC9999102785', 'SRC9999102786', 'SRC9999102787', 'SRC9999132710', 'SRC9999132719',
+        // Without hist_case_data in payloads
+        'EAC9999103400', 'EAC9999103402', 'EAC9999103406', 'EAC9999103407', 'EAC9999103408', 
+        'EAC9999103409', 'EAC9999103412', 'EAC9999103413', 'EAC9999103414', 'EAC9999103415', 
+        'EAC9999103420', 'EAC9999103421', 'EAC9999103424', 'EAC9999103425', 'EAC9999103426', 
+        'EAC9999103428', 'EAC9999103429', 'EAC9999103431', 'EAC9999103432', 'LIN9999106501', 
+        'LIN9999106507', 'SRC9999132694', 'SRC9999132695', 'SRC9999132706', 'SRC9999132707'
       ]
     };
     
@@ -720,15 +772,64 @@ class OPTPlanner {
       console.log('⏳ Showing loading state...');
       this.showUSCISLoading();
       
-      // For now, simulate API call with sandbox data
-      // TODO: Replace with real USCIS API call when credentials are available
-      console.log('🧪 Simulating USCIS API call...');
-      const mockResponse = await this.simulateUSCISAPI(receiptNumber);
-      console.log('📊 Mock response received:', mockResponse);
+      // Validate receipt number format
+      if (!this.isValidReceiptNumber(receiptNumber)) {
+        throw new Error('Invalid receipt number format. Must be 13 characters (3 letters + 10 digits).');
+      }
       
-      // Display results
-      console.log('🎨 Displaying results...');
-      this.displayUSCISResults(mockResponse);
+      // 🔒 SECURE: Call Cloudflare Worker instead of USCIS directly
+      console.log('🔒 Making secure API call through Cloudflare Worker...');
+      
+      try {
+        // Call your Cloudflare Worker (replace with your actual domain)
+        const workerUrl = 'https://uscis-api-worker.abc-preethamreddy.workers.dev/';
+        
+        const response = await fetch(workerUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            receiptNumber: receiptNumber
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Secure API call successful:', data);
+          this.displayUSCISResults(data);
+        } else {
+          const errorData = await response.json();
+          throw new Error(`Worker error: ${errorData.error || response.statusText}`);
+        }
+        
+      } catch (workerError) {
+        console.warn('⚠️ Cloudflare Worker not available:', workerError.message);
+        
+        // Show helpful error message
+        if (workerError.message.includes('Failed to fetch')) {
+          this.showUSCISError(
+            '🔒 Cloudflare Worker not deployed yet. ' +
+            'Please follow the deployment guide to set up secure USCIS API integration. ' +
+            'Your credentials will be protected once deployed.'
+          );
+        } else {
+          this.showUSCISError(
+            `🔒 Worker Error: ${workerError.message}. ` +
+            'Please check your Cloudflare Worker configuration.'
+          );
+        }
+        
+        // Track security event
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'security_warning', {
+            'event_category': 'security',
+            'event_label': 'worker_not_deployed'
+          });
+        }
+        
+        return;
+      }
       
       // Track API usage for analytics
       if (typeof gtag !== 'undefined') {
@@ -739,11 +840,11 @@ class OPTPlanner {
         });
       }
       
-      console.log('✅ USCIS status check completed successfully');
+      console.log('✅ USCIS status check completed securely');
       
     } catch (error) {
       console.error('❌ USCIS API Error:', error);
-      this.showUSCISError('Failed to check case status. Please try again.');
+      this.showUSCISError(`Security check failed: ${error.message}`);
     }
   }
   
@@ -794,189 +895,155 @@ class OPTPlanner {
     };
   }
   
+  // ⚠️ SECURITY WARNING: USCIS API Integration
+  // 
+  // NEVER implement OAuth2 client credentials flow in browser-side JavaScript!
+  // This exposes your API credentials in the network tab where anyone can steal them.
+  // 
+  // SECURE APPROACHES:
+  // 1. Backend API Proxy (recommended)
+  // 2. API Gateway (Cloudflare Workers, AWS API Gateway)
+  // 3. Server-side authentication only
+  // 
+  // The methods below are for demonstration only and will show security warnings.
+  
+  async getUSCISAccessToken() {
+    console.error('🚨 SECURITY VIOLATION: Attempting to get access token from browser');
+    throw new Error('SECURITY: OAuth2 client credentials cannot be implemented in browser. Use server-side proxy.');
+  }
+  
+  async callUSCISAPIDirect(receiptNumber) {
+    console.error('🚨 SECURITY VIOLATION: Attempting to call USCIS API directly from browser');
+    throw new Error('SECURITY: Direct API calls cannot be implemented in browser. Use server-side proxy.');
+  }
+  
+  async testUSCISConnectivity() {
+    console.error('🚨 SECURITY VIOLATION: Attempting to test USCIS connectivity from browser');
+    throw new Error('SECURITY: API connectivity tests cannot be implemented in browser. Use server-side proxy.');
+  }
+  
+  async testUSCISEndpoint() {
+    console.error('🚨 SECURITY VIOLATION: Attempting to test USCIS endpoint from browser');
+    throw new Error('SECURITY: Endpoint tests cannot be implemented in browser. Use server-side proxy.');
+  }
+  
+  async analyzeUSCISAuthError() {
+    console.error('🚨 SECURITY VIOLATION: Attempting to analyze USCIS auth errors from browser');
+    throw new Error('SECURITY: Auth error analysis cannot be implemented in browser. Use server-side proxy.');
+  }
+  
+  async testDirectAPIKeyAuth() {
+    console.error('🚨 SECURITY VIOLATION: Attempting to test direct API key auth from browser');
+    throw new Error('SECURITY: Direct API key tests cannot be implemented in browser. Use server-side proxy.');
+  }
+
+  // Essential methods for the secure implementation
   showUSCISLoading() {
     const results = document.getElementById('uscisResults');
     const statusBadge = document.getElementById('statusBadge');
     
-    results.classList.remove('hidden');
-    statusBadge.textContent = 'Checking...';
-    statusBadge.className = 'status-badge pending';
-    
-    // Show loading state in results
-    document.getElementById('resultReceiptNumber').textContent = 'Loading...';
-    document.getElementById('resultStatus').textContent = 'Loading...';
-    document.getElementById('resultLastUpdated').textContent = 'Loading...';
-    document.getElementById('resultDescription').textContent = 'Loading...';
+    if (results && statusBadge) {
+      results.classList.remove('hidden');
+      statusBadge.textContent = 'Checking...';
+      statusBadge.className = 'status-badge pending';
+      
+      // Show loading state in results
+      const elements = ['resultReceiptNumber', 'resultStatus', 'resultLastUpdated', 'resultDescription'];
+      elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = 'Loading...';
+      });
+    }
   }
   
   displayUSCISResults(data) {
     const statusBadge = document.getElementById('statusBadge');
     
-    // Update status badge
-    statusBadge.textContent = data.status.includes('Received') ? 'Received' : 
-                              data.status.includes('Review') ? 'Reviewing' : 
-                              data.status.includes('Evidence') ? 'RFE Sent' : 'Processing';
-    
-    // Set badge color
-    statusBadge.className = 'status-badge ' + (
-      data.status.includes('Received') ? 'pending' :
-      data.status.includes('Review') ? 'pending' :
-      data.status.includes('Evidence') ? 'warning' : 'pending'
-    );
+    if (statusBadge) {
+      // Update status badge with better status mapping
+      let badgeText = 'Processing';
+      let badgeClass = 'pending';
+      
+      if (data.status.includes('Approved')) {
+        badgeText = 'Approved';
+        badgeClass = 'success';
+      } else if (data.status.includes('Received')) {
+        badgeText = 'Received';
+        badgeClass = 'pending';
+      } else if (data.status.includes('Review')) {
+        badgeText = 'Reviewing';
+        badgeClass = 'pending';
+      } else if (data.status.includes('Evidence')) {
+        badgeText = 'RFE Sent';
+        badgeClass = 'warning';
+      } else if (data.status.includes('Denied')) {
+        badgeText = 'Denied';
+        badgeClass = 'rejected';
+      } else if (data.status.includes('Completed')) {
+        badgeText = 'Completed';
+        badgeClass = 'success';
+      }
+      
+      statusBadge.textContent = badgeText;
+      statusBadge.className = `status-badge ${badgeClass}`;
+    }
     
     // Update result fields
-    document.getElementById('resultReceiptNumber').textContent = data.receiptNumber;
-    document.getElementById('resultStatus').textContent = data.status;
-    document.getElementById('resultLastUpdated').textContent = data.lastUpdated;
-    document.getElementById('resultDescription').textContent = data.description;
+    const elements = {
+      'resultReceiptNumber': data.receiptNumber,
+      'resultStatus': data.status,
+      'resultLastUpdated': data.lastUpdated,
+      'resultDescription': data.description
+    };
     
-    // Add sandbox indicator if testing
-    if (data.isSandbox) {
-      const disclaimer = document.querySelector('.legal-disclaimer small');
-      disclaimer.innerHTML = '🧪 Testing with USCIS Sandbox Data - Not Real Case';
-    }
+    Object.entries(elements).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    });
+    
+    // Log the full response for debugging
+    console.log('📊 Full API response:', data);
   }
   
   showUSCISError(message) {
     const results = document.getElementById('uscisResults');
     const statusBadge = document.getElementById('statusBadge');
     
-    results.classList.remove('hidden');
-    statusBadge.textContent = 'Error';
-    statusBadge.className = 'status-badge rejected';
+    if (results && statusBadge) {
+      results.classList.remove('hidden');
+      statusBadge.textContent = 'Error';
+      statusBadge.className = 'status-badge rejected';
+      
+      const elements = {
+        'resultReceiptNumber': 'N/A',
+        'resultStatus': 'Error',
+        'resultLastUpdated': 'N/A',
+        'resultDescription': message
+      };
+      
+      Object.entries(elements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+      });
+    }
+  }
+
+  isValidReceiptNumber(receiptNumber) {
+    // Remove any dashes and validate format
+    const cleanReceipt = receiptNumber.replace(/-/g, '');
     
-    document.getElementById('resultReceiptNumber').textContent = 'N/A';
-    document.getElementById('resultStatus').textContent = 'Error';
-    document.getElementById('resultLastUpdated').textContent = 'N/A';
-    document.getElementById('resultDescription').textContent = message;
+    // Check if it matches the required format: 3 letters + 10 digits
+    const regex = /^[a-zA-Z]{3}[0-9]{10}$/;
+    
+    if (!regex.test(cleanReceipt)) {
+      return false;
+    }
+    
+    // Check if it's one of the valid staging receipt numbers
+    return this.uscisConfig.sandboxCases.includes(cleanReceipt);
   }
 
   // Old conflicting functions removed - using new USCIS integration
 
   // Native date input is now used - no need for complex custom functions
 }
-
-// Initialize the planner when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  new OPTPlanner();
-  
-  // Add some additional mobile enhancements
-  if ('ontouchstart' in window) {
-    // Add touch-specific styles
-    document.body.classList.add('touch-device');
-    
-    // Prevent zoom on double tap for iOS
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', (event) => {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-  }
-
-  // Add intersection observer for animations
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    });
-
-    // Observe all panels for animation
-    document.querySelectorAll('.input-panel, .timeline-section, .uscis-section, .info-section').forEach(panel => {
-      observer.observe(panel);
-    });
-  }
-});
-
-// Add CSS for error notifications and additional styles
-const style = document.createElement('style');
-style.textContent = `
-  .error-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  .error-icon {
-    font-size: 1.2rem;
-  }
-  
-  .error-message {
-    flex: 1;
-    font-weight: 500;
-  }
-  
-  .error-close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: var(--transition);
-  }
-  
-  .error-close:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-  
-  .animate-in {
-    animation: slideInUp 0.6s ease-out;
-  }
-  
-  .touch-device .btn:active,
-  .touch-device .date-preset:active {
-    transform: scale(0.95);
-  }
-  
-  /* Additional animations for timeline items */
-  .timeline-item {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease-out;
-  }
-  
-  .timeline-item.animate-in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  /* Hover effects for interactive elements */
-  .timeline-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .stat-item:hover .stat-number {
-    transform: scale(1.1);
-  }
-  
-  /* Focus styles for accessibility */
-  .btn:focus,
-  input:focus,
-  select:focus,
-  .date-preset:focus {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-  }
-  
-  /* Form actions spacing */
-  .form-actions {
-    margin-top: 20px;
-  }
-`;
-document.head.appendChild(style); 
