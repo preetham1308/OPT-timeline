@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPT Timeline Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="floating-number" data-number="90">90</div>
+        <div class="floating-number" data-number="60">60</div>
+        <div class="floating-number" data-number="12">12</div>
+        <div class="floating-number" data-number="24">24</div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="brand">
+                <span class="brand-number">OPT</span>
+                <span class="brand-text">Timeline</span>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="90">0</span>
+                    <span class="stat-label">Days Before</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="60">0</span>
+                    <span class="stat-label">Days After</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="12">0</span>
+                    <span class="stat-label">Months OPT</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-grid">
+                <!-- Left Panel - Input Form -->
+                <div class="input-panel">
+                    <div class="panel-header">
+                        <h2>Graduation Details</h2>
+                        <p>Enter your information to calculate OPT timelines</p>
+                    </div>
+                    
+                    <form id="plannerForm" class="planner-form">
+                        <div class="form-group">
+                            <label for="graduationDate">
+                                <span class="label-icon">📅</span>
+                                Graduation Date
+                            </label>
+                            <div class="date-input-wrapper">
+                                <input type="date" id="graduationDate" required>
+                                <div class="date-presets">
+                                    <button type="button" class="date-preset" data-days="30">30 days</button>
+                                    <button type="button" class="date-preset" data-days="60">60 days</button>
+                                    <button type="button" class="date-preset" data-days="90">90 days</button>
+                                    <button type="button" class="date-preset" data-days="180">6 months</button>
+                                </div>
+                                <!-- Custom date picker fallback -->
+                                <div class="custom-date-picker" id="customGraduationPicker" style="display: none;">
+                                    <div class="picker-header">
+                                        <button type="button" class="picker-nav" id="prevMonth">‹</button>
+                                        <span class="picker-month" id="currentMonth">July 2025</span>
+                                        <button type="button" class="picker-nav" id="nextMonth">›</button>
+                                    </div>
+                                    <div class="picker-weekdays">
+                                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                                    </div>
+                                    <div class="picker-days" id="pickerDays"></div>
+                                    <div class="picker-actions">
+                                        <button type="button" class="picker-btn" id="todayBtn">Today</button>
+                                        <button type="button" class="picker-btn" id="clearBtn">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="programLevel">
+                                <span class="label-icon">🎓</span>
+                                Program Level
+                            </label>
+                            <select id="programLevel">
+                                <option value="bachelors">Bachelor's</option>
+                                <option value="masters" selected>Master's</option>
+                                <option value="phd">PhD</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="isSTEM">
+                                <span class="label-icon">🔬</span>
+                                STEM Extension
+                            </label>
+                            <select id="isSTEM">
+                                <option value="no" selected>No (12 months)</option>
+                                <option value="yes">Yes (24 months)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="stemOptEndGroup" style="display: none;">
+                            <label for="stemOptEndDate">
+                                <span class="label-icon">📅</span>
+                                OPT End Date
+                                <span class="help-text">(When your current OPT expires - for STEM extension planning)</span>
+                            </label>
+                            <div class="date-input-wrapper">
+                                <input type="date" id="stemOptEndDate">
+                                <div class="date-presets">
+                                    <button type="button" class="date-preset" data-days="365">1 year</button>
+                                    <button type="button" class="date-preset" data-days="730">2 years</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-text">Calculate Timeline</span>
+                                <span class="btn-icon">→</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Panel - Results & USCIS -->
+                <div class="results-panel">
+                    <!-- Timeline Results -->
+                    <div id="timelineResults" class="timeline-section hidden">
+                        <div class="section-header">
+                            <h3>Your OPT Timeline</h3>
+                            <p>Based on current USCIS regulations</p>
+                        </div>
+                        
+                        <div class="timeline-grid">
+                            <div class="timeline-item critical">
+                                <div class="timeline-icon">⚠️</div>
+                                <div class="timeline-content">
+                                    <h4>Earliest Filing</h4>
+                                    <div class="timeline-date" id="earliestFiling"></div>
+                                    <p>90 days before graduation</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item important">
+                                <div class="timeline-icon">🎯</div>
+                                <div class="timeline-content">
+                                    <h4>Latest Filing</h4>
+                                    <div class="timeline-date" id="latestFiling"></div>
+                                    <p>60 days after graduation</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item info">
+                                <div class="timeline-icon">📅</div>
+                                <div class="timeline-content">
+                                    <h4>OPT Start Window</h4>
+                                    <div class="timeline-date" id="startWindow"></div>
+                                    <p>From graduation to 60 days after</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item success">
+                                <div class="timeline-icon">✅</div>
+                                <div class="timeline-content">
+                                    <h4>OPT Duration</h4>
+                                    <div class="timeline-date" id="optDuration"></div>
+                                    <p id="optDurationText">Standard OPT period</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- STEM Extension Timeline (if applicable) -->
+                        <div id="stemTimeline" class="stem-timeline hidden">
+                            <div class="section-header">
+                                <h4>STEM Extension Timeline</h4>
+                                <p>Additional 24-month extension details</p>
+                            </div>
+                            <div class="timeline-grid">
+                                <div class="timeline-item info">
+                                    <div class="timeline-icon">🔬</div>
+                                    <div class="timeline-content">
+                                        <h4>STEM Extension Filing</h4>
+                                        <div class="timeline-date" id="stemFilingWindow"></div>
+                                        <p>File 90 days before OPT expires</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item success">
+                                    <div class="timeline-icon">📈</div>
+                                    <div class="timeline-content">
+                                        <h4>Total OPT Period</h4>
+                                        <div class="timeline-date" id="totalOptPeriod"></div>
+                                        <p>Combined standard + STEM extension</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="countdown-section">
+                            <h4>Time Remaining</h4>
+                            <div class="countdown-grid">
+                                <div class="countdown-item">
+                                    <span class="countdown-number" id="daysUntilEarliest">-</span>
+                                    <span class="countdown-label">Days until earliest filing</span>
+                                </div>
+                                <div class="countdown-item">
+                                    <span class="countdown-number" id="daysUntilLatest">-</span>
+                                    <span class="countdown-label">Days until latest filing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- USCIS Status Checker -->
+                    <div class="uscis-section">
+                        <div class="section-header">
+                            <h3>USCIS Status Checker</h3>
+                            <p>Check your application status directly</p>
+                        </div>
+                        
+                        <div class="uscis-form">
+                            <div class="form-group">
+                                <label for="receiptNumber">Receipt Number</label>
+                                <input type="text" id="receiptNumber" placeholder="YSC1234567890" maxlength="13">
+                            </div>
+                            <button id="checkStatusBtn" class="btn btn-secondary">
+                                <span class="btn-text">Check Status</span>
+                                <span class="btn-icon">📋</span>
+                            </button>
+                        </div>
+                        
+                        <div id="uscisResults" class="uscis-results hidden">
+                            <div class="status-header">
+                                <h4>Application Status</h4>
+                                <div class="status-badge" id="statusBadge">Pending</div>
+                            </div>
+                            <div class="status-details">
+                                <div class="status-item">
+                                    <span class="status-label">Receipt Number:</span>
+                                    <span class="status-value" id="displayReceiptNumber"></span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">Form Type:</span>
+                                    <span class="status-value" id="formType"></span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">Current Status:</span>
+                                    <span class="status-value" id="currentStatus"></span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">Last Updated:</span>
+                                    <span class="status-value" id="lastUpdated"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Section -->
+                    <div class="info-section">
+                        <h4>Important Notes</h4>
+                        <ul class="info-list">
+                            <li>File I-765 between 90 days before and 60 days after graduation</li>
+                            <li>OPT must start within 60 days of graduation</li>
+                            <li>STEM graduates may be eligible for 24-month extension</li>
+                            <li>STEM extension must be filed 90 days before OPT expires</li>
+                            <li>Always verify dates with your DSO and current regulations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Checking USCIS status...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

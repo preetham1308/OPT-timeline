@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Test - OPT Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .mobile-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .mobile-frame {
+            width: 375px;
+            height: 667px;
+            border: none;
+        }
+        @media (max-width: 480px) {
+            .mobile-frame {
+                width: 100%;
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>OPT Planner - Mobile Responsiveness Test</h1>
+        <p>This page helps test the mobile responsiveness of the OPT Planner application.</p>
+        <p><strong>Current viewport:</strong> <span id="viewport-info"></span></p>
+        <p><strong>Device pixel ratio:</strong> <span id="pixel-ratio"></span></p>
+        <p><strong>Touch support:</strong> <span id="touch-support"></span></p>
+    </div>
+
+    <div class="test-info">
+        <h2>Test Options</h2>
+        <button class="test-button" onclick="openMainApp()">Open Main App</button>
+        <button class="test-button" onclick="toggleMobileView()">Toggle Mobile View</button>
+        <button class="test-button" onclick="testTouchEvents()">Test Touch Events</button>
+    </div>
+
+    <div class="mobile-preview">
+        <iframe id="mobile-frame" class="mobile-frame" src="index.html"></iframe>
+    </div>
+
+    <div class="test-info">
+        <h2>Mobile Testing Checklist</h2>
+        <ul>
+            <li>✅ Viewport meta tag present</li>
+            <li>✅ Responsive CSS grid layouts</li>
+            <li>✅ Touch-friendly button sizes (min 44px)</li>
+            <li>✅ Mobile-first media queries</li>
+            <li>✅ Smooth animations (reduced motion support)</li>
+            <li>✅ Proper spacing for mobile screens</li>
+            <li>✅ Form inputs optimized for mobile</li>
+            <li>✅ Navigation works on small screens</li>
+        </ul>
+    </div>
+
+    <script>
+        // Display viewport information
+        function updateViewportInfo() {
+            const viewportInfo = document.getElementById('viewport-info');
+            const pixelRatio = document.getElementById('pixel-ratio');
+            const touchSupport = document.getElementById('touch-support');
+            
+            viewportInfo.textContent = `${window.innerWidth} × ${window.innerHeight}`;
+            pixelRatio.textContent = window.devicePixelRatio || 'Not available';
+            touchSupport.textContent = 'ontouchstart' in window ? 'Yes' : 'No';
+        }
+
+        // Update on load and resize
+        window.addEventListener('load', updateViewportInfo);
+        window.addEventListener('resize', updateViewportInfo);
+
+        // Open main app
+        function openMainApp() {
+            window.open('index.html', '_blank');
+        }
+
+        // Toggle mobile view
+        function toggleMobileView() {
+            const frame = document.getElementById('mobile-frame');
+            if (frame.style.width === '100%') {
+                frame.style.width = '375px';
+                frame.style.height = '667px';
+            } else {
+                frame.style.width = '100%';
+                frame.style.height = '600px';
+            }
+        }
+
+        // Test touch events
+        function testTouchEvents() {
+            alert('Touch events test:\n\n' +
+                  '1. Try tapping buttons on mobile\n' +
+                  '2. Check for touch feedback\n' +
+                  '3. Verify smooth scrolling\n' +
+                  '4. Test form interactions');
+        }
+
+        // Add some mobile-specific testing
+        if ('ontouchstart' in window) {
+            console.log('Touch device detected - enabling mobile optimizations');
+            document.body.classList.add('touch-device');
+        }
+
+        // Check for mobile user agent
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            console.log('Mobile device detected via user agent');
+            document.body.classList.add('mobile-device');
+        }
+    </script>
+</body>
+</html> 

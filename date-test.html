@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Picker Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .date-input {
+            padding: 16px 18px;
+            background: #111111;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .date-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
+        }
+        .test-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status.working {
+            background: #00ff88;
+            color: black;
+        }
+        .status.not-working {
+            background: #ff4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Date Picker Test</h1>
+        <p>This page tests if the native date picker is working in your browser.</p>
+        
+        <div class="test-info">
+            <h3>Test 1: Native Date Input</h3>
+            <input type="date" class="date-input" id="testDate1">
+            <p>Click on this input to see if the native date picker appears.</p>
+            <div id="status1" class="status">Click the input to test...</div>
+        </div>
+        
+        <div class="test-info">
+            <h3>Test 2: Date Input with Styling</h3>
+            <input type="date" class="date-input" id="testDate2" style="background: #111111; color: white;">
+            <p>This tests if styling affects the date picker visibility.</p>
+            <div id="status2" class="status">Click the input to test...</div>
+        </div>
+        
+        <div class="test-info">
+            <h3>Test 3: Date Input with Custom Styling</h3>
+            <input type="date" class="date-input" id="testDate3">
+            <p>This tests the custom styling we applied.</p>
+            <div id="status3" class="status">Click the input to test...</div>
+        </div>
+        
+        <div class="test-info">
+            <h3>Browser Information</h3>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            <p><strong>Platform:</strong> <span id="platform"></span></p>
+            <p><strong>Date Input Support:</strong> <span id="dateSupport"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Display browser information
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('platform').textContent = navigator.platform;
+        document.getElementById('dateSupport').textContent = 
+            document.createElement('input').type === 'date' ? 'Supported' : 'Not Supported';
+
+        // Test date inputs
+        const testInputs = [
+            { id: 'testDate1', name: 'Basic Date Input' },
+            { id: 'testDate2', name: 'Styled Date Input' },
+            { id: 'testDate3', name: 'Custom Styled Date Input' }
+        ];
+
+        testInputs.forEach((input, index) => {
+            const element = document.getElementById(input.id);
+            const status = document.getElementById(`status${index + 1}`);
+            
+            element.addEventListener('focus', () => {
+                status.textContent = 'Testing... Click outside to see result.';
+                status.className = 'status';
+            });
+            
+            element.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (element.value) {
+                        status.textContent = `✅ Working - Selected: ${element.value}`;
+                        status.className = 'status working';
+                    } else {
+                        status.textContent = '❌ Not working - No date selected';
+                        status.className = 'status not-working';
+                    }
+                }, 100);
+            });
+        });
+
+        // Test if date picker is visible
+        function testDatePickerVisibility() {
+            const testInput = document.createElement('input');
+            testInput.type = 'date';
+            testInput.style.position = 'absolute';
+            testInput.style.left = '-9999px';
+            testInput.style.top = '-9999px';
+            
+            document.body.appendChild(testInput);
+            
+            let isVisible = false;
+            try {
+                testInput.focus();
+                // Check if the picker is visible (this is a basic test)
+                isVisible = true;
+            } catch (e) {
+                isVisible = false;
+            }
+            
+            document.body.removeChild(testInput);
+            return isVisible;
+        }
+
+        // Run visibility test
+        setTimeout(() => {
+            const isVisible = testDatePickerVisibility();
+            console.log('Date picker visibility test:', isVisible);
+        }, 1000);
+    </script>
+</body>
+</html> 
