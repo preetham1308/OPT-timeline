@@ -2,7 +2,6 @@ class OPTPlanner {
   constructor() {
     this.form = document.getElementById('plannerForm');
     this.timelineResults = document.getElementById('timelineResults');
-    this.checkStatusBtn = document.getElementById('checkStatusBtn');
     this.loadingOverlay = document.getElementById('loadingOverlay');
     this.stemOptEndGroup = document.getElementById('stemOptEndGroup');
     this.stemTimeline = document.getElementById('stemTimeline');
@@ -24,7 +23,6 @@ class OPTPlanner {
 
   bindEvents() {
     this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
-    this.checkStatusBtn.addEventListener('click', () => this.checkUSCISStatus());
     
     // Auto-calculate on date changes
     document.getElementById('graduationDate').addEventListener('change', () => this.autoCalculate());
@@ -639,8 +637,13 @@ class OPTPlanner {
   }
 
   initUSCISIntegration() {
+    console.log('🔧 Initializing USCIS Integration...');
+    
     const uscisForm = document.getElementById('uscisForm');
     const testSandboxBtn = document.getElementById('testSandboxBtn');
+    
+    console.log('📋 USCIS Form found:', uscisForm);
+    console.log('🧪 Test Sandbox Button found:', testSandboxBtn);
     
     // USCIS API Configuration
     this.uscisConfig = {
@@ -656,35 +659,53 @@ class OPTPlanner {
       ]
     };
     
+    console.log('⚙️ USCIS Config loaded:', this.uscisConfig);
+    
     // Handle form submission
-    uscisForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const receiptNumber = document.getElementById('receiptNumber').value.trim();
-      if (receiptNumber) {
-        this.checkUSCISStatus(receiptNumber);
-      }
-    });
+    if (uscisForm) {
+      uscisForm.addEventListener('submit', (e) => {
+        console.log('📝 USCIS Form submitted');
+        e.preventDefault();
+        const receiptNumber = document.getElementById('receiptNumber').value.trim();
+        console.log('🔍 Receipt Number:', receiptNumber);
+        if (receiptNumber) {
+          this.checkUSCISStatus(receiptNumber);
+        }
+      });
+    }
     
     // Test sandbox button
-    testSandboxBtn.addEventListener('click', () => {
-      const randomCase = this.uscisConfig.sandboxCases[
-        Math.floor(Math.random() * this.uscisConfig.sandboxCases.length)
-      ];
-      document.getElementById('receiptNumber').value = randomCase;
-      this.checkUSCISStatus(randomCase);
-    });
+    if (testSandboxBtn) {
+      testSandboxBtn.addEventListener('click', () => {
+        console.log('🧪 Test Sandbox Button clicked');
+        const randomCase = this.uscisConfig.sandboxCases[
+          Math.floor(Math.random() * this.uscisConfig.sandboxCases.length)
+        ];
+        console.log('🎲 Random test case:', randomCase);
+        document.getElementById('receiptNumber').value = randomCase;
+        this.checkUSCISStatus(randomCase);
+      });
+    }
+    
+    console.log('✅ USCIS Integration initialized');
   }
   
   async checkUSCISStatus(receiptNumber) {
+    console.log('🚀 Starting USCIS status check for:', receiptNumber);
+    
     try {
       // Show loading state
+      console.log('⏳ Showing loading state...');
       this.showUSCISLoading();
       
       // For now, simulate API call with sandbox data
       // TODO: Replace with real USCIS API call when credentials are available
+      console.log('🧪 Simulating USCIS API call...');
       const mockResponse = await this.simulateUSCISAPI(receiptNumber);
+      console.log('📊 Mock response received:', mockResponse);
       
       // Display results
+      console.log('🎨 Displaying results...');
       this.displayUSCISResults(mockResponse);
       
       // Track API usage for analytics
@@ -696,8 +717,10 @@ class OPTPlanner {
         });
       }
       
+      console.log('✅ USCIS status check completed successfully');
+      
     } catch (error) {
-      console.error('USCIS API Error:', error);
+      console.error('❌ USCIS API Error:', error);
       this.showUSCISError('Failed to check case status. Please try again.');
     }
   }
@@ -806,72 +829,7 @@ class OPTPlanner {
     document.getElementById('resultDescription').textContent = message;
   }
 
-  showLoading() {
-    this.loadingOverlay.classList.remove('hidden');
-    this.checkStatusBtn.disabled = true;
-    this.checkStatusBtn.innerHTML = '<span class="btn-text">Checking...</span><span class="btn-icon">⏳</span>';
-  }
-
-  hideLoading() {
-    this.loadingOverlay.classList.add('hidden');
-    this.checkStatusBtn.disabled = false;
-    this.checkStatusBtn.innerHTML = '<span class="btn-text">Check Status</span><span class="btn-icon">🔍</span>';
-  }
-
-  showError(message) {
-    // Create error notification
-    const notification = document.createElement('div');
-    notification.className = 'error-notification';
-    notification.innerHTML = `
-      <div class="error-content">
-        <span class="error-icon">⚠️</span>
-        <span class="error-message">${message}</span>
-        <button class="error-close">×</button>
-      </div>
-    `;
-
-    // Add styles
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--accent-danger);
-      color: white;
-      padding: 16px 20px;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-      transform: translateX(400px);
-      transition: var(--transition);
-    `;
-
-    // Add to page
-    document.body.appendChild(notification);
-
-    // Animate in
-    setTimeout(() => {
-      notification.style.transform = 'translateX(0)';
-    }, 100);
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      this.removeNotification(notification);
-    }, 5000);
-
-    // Close button functionality
-    notification.querySelector('.error-close').addEventListener('click', () => {
-      this.removeNotification(notification);
-    });
-  }
-
-  removeNotification(notification) {
-    notification.style.transform = 'translateX(400px)';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
-  }
+  // Old conflicting functions removed - using new USCIS integration
 
   // Native date input is now used - no need for complex custom functions
 }
