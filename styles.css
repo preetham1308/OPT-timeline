@@ -319,7 +319,7 @@ body {
   font-weight: 500;
 }
 
-/* Main optplanner Heading */
+/* Main OPT PLANNER Heading */
 .main-heading {
   text-align: center;
   margin: 8px 0 8px 0;
@@ -341,7 +341,7 @@ body {
   background-clip: text;
   margin: 0 0 20px 0;
   text-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   position: relative;
   z-index: 1;
   text-transform: uppercase;
