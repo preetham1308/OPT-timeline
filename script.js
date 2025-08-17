@@ -333,6 +333,9 @@ class OPTPlanner {
     if (stemOptEndGroup) {
       stemOptEndGroup.style.display = dates.stemExtension ? 'block' : 'none';
     }
+
+    // Update calendar buttons with dates
+    this.updateCalendarButtons(dates);
   }
 
     renderCustomCalendar() {
@@ -482,6 +485,211 @@ class OPTPlanner {
       if (successMsg.parentNode) {
         successMsg.parentNode.removeChild(successMsg);
       }
+    }, 3000);
+  }
+
+  // Calendar Integration Methods
+  updateCalendarButtons(dates) {
+    // Update calendar button data attributes with dates
+    const addEarliestFiling = document.getElementById('addEarliestFiling');
+    const addLatestFiling = document.getElementById('addLatestFiling');
+
+    // Update date displays
+    const earliestFilingDate = document.getElementById('earliestFilingDate');
+    const latestFilingDate = document.getElementById('latestFilingDate');
+
+    if (earliestFilingDate) {
+      earliestFilingDate.textContent = dates.earliestFiling.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    
+    if (latestFilingDate) {
+      latestFilingDate.textContent = dates.latestFiling.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    if (addEarliestFiling) {
+      addEarliestFiling.dataset.date = dates.earliestFiling.toISOString();
+      addEarliestFiling.disabled = false;
+    }
+    
+    if (addLatestFiling) {
+      addLatestFiling.dataset.date = dates.latestFiling.toISOString();
+      addLatestFiling.disabled = false;
+    }
+
+    // Add event listeners for calendar buttons
+    this.bindCalendarEvents();
+  }
+
+  bindCalendarEvents() {
+    const calendarButtons = document.querySelectorAll('.calendar-add-btn');
+    
+    calendarButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.addToCalendar(button);
+      });
+    });
+  }
+
+  addToCalendar(button) {
+    const date = button.dataset.date;
+    const title = button.dataset.title;
+    const description = button.dataset.description;
+    
+    if (!date) {
+      console.error('No date available for calendar event');
+      return;
+    }
+
+    const eventDate = new Date(date);
+    const endDate = new Date(eventDate);
+    endDate.setHours(endDate.getHours() + 1); // 1 hour duration
+
+    // Create calendar event data
+    const event = {
+      title: title,
+      description: description,
+      start: eventDate.toISOString(),
+      end: endDate.toISOString(),
+      location: 'OPT Application Process',
+      allDay: false
+    };
+
+    // Generate calendar links
+    const googleCalendarUrl = this.generateGoogleCalendarUrl(event);
+    const appleCalendarUrl = this.generateAppleCalendarUrl(event);
+    const outlookUrl = this.generateOutlookUrl(event);
+
+    // Show calendar options
+    this.showCalendarOptions(button, {
+      google: googleCalendarUrl,
+      apple: appleCalendarUrl,
+      outlook: outlookUrl
+    });
+  }
+
+  generateGoogleCalendarUrl(event) {
+    const startDate = new Date(event.start).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const endDate = new Date(event.end).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates: `${startDate}/${endDate}`,
+      details: event.description,
+      location: event.location,
+      ctz: Intl.DateTimeFormat().resolvedOptions().timeZone
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  generateAppleCalendarUrl(event) {
+    const startDate = new Date(event.start).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const endDate = new Date(event.end).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    
+    const params = new URLSearchParams({
+      title: event.title,
+      description: event.description,
+      location: event.location,
+      start: event.start,
+      end: event.end,
+      allDay: 'false'
+    });
+
+    return `data:text/calendar;charset=utf8,${this.generateICSContent(event)}`;
+  }
+
+  generateOutlookUrl(event) {
+    const startDate = new Date(event.start).toISOString();
+    const endDate = new Date(event.end).toISOString();
+    
+    const params = new URLSearchParams({
+      path: '/calendar/action/compose',
+      rru: 'addevent',
+      subject: event.title,
+      startdt: startDate,
+      enddt: endDate,
+      body: event.description,
+      location: event.location
+    });
+
+    return `https://outlook.live.com/calendar/0/${params.toString()}`;
+  }
+
+  generateICSContent(event) {
+    const startDate = new Date(event.start).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const endDate = new Date(event.end).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//OPT Planner//Calendar Event//EN',
+      'BEGIN:VEVENT',
+      `DTSTART:${startDate}`,
+      `DTEND:${endDate}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description}`,
+      `LOCATION:${event.location}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  showCalendarOptions(button, urls) {
+    // Create calendar options modal
+    const modal = document.createElement('div');
+    modal.className = 'calendar-modal';
+    modal.innerHTML = `
+      <div class="calendar-modal-content">
+        <div class="calendar-modal-header">
+          <h3>📅 Add to Calendar</h3>
+          <button class="modal-close" onclick="this.closest('.calendar-modal').remove()">×</button>
+        </div>
+        <div class="calendar-modal-body">
+          <p>Choose your calendar app:</p>
+          <div class="calendar-options">
+            <a href="${urls.google}" target="_blank" class="calendar-option google">
+              <span class="option-icon">📅</span>
+              <span class="option-text">Google Calendar</span>
+            </a>
+            <a href="${urls.apple}" download="opt-event.ics" class="calendar-option apple">
+              <span class="option-icon">📅</span>
+              <span class="option-text">Apple Calendar</span>
+            </a>
+            <a href="${urls.outlook}" target="_blank" class="calendar-option outlook">
+              <span class="option-icon">📅</span>
+              <span class="option-text">Outlook</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add modal styles
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    document.body.appendChild(modal);
+
+    // Add success state to button
+    button.classList.add('success');
+    button.innerHTML = '<span class="btn-icon">✅</span><span class="btn-text">Added!</span>';
+    
+    // Reset button after 3 seconds
+    setTimeout(() => {
+      button.classList.remove('success');
+      button.innerHTML = '<span class="btn-icon">📅</span><span class="btn-text">Add</span>';
     }, 3000);
   }
 }

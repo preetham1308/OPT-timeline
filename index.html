@@ -276,6 +276,46 @@
                                 <small>Calculated as of: <span id="currentTimeDisplay">-</span></small>
                             </div>
                         </div>
+
+                        <!-- Calendar Integration Section -->
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <h4>📅 Add Critical Deadlines to Calendar</h4>
+                                <p>Never miss an OPT filing deadline! Add these important dates to your calendar with reminders</p>
+                            </div>
+                            <div class="calendar-events">
+                                <div class="calendar-event" id="earliestFilingEvent">
+                                    <div class="event-info">
+                                        <div class="event-date" id="earliestFilingDate">-</div>
+                                        <div class="event-details">
+                                            <h5>Earliest Filing Date</h5>
+                                            <p>First day you can submit your OPT application</p>
+                                        </div>
+                                    </div>
+                                    <button class="calendar-add-btn" id="addEarliestFiling" data-date="" data-title="OPT Application - Earliest Filing Date" data-description="First day you can submit your OPT application">
+                                        <span class="btn-icon">📅</span>
+                                        <span class="btn-text">Add</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="calendar-event" id="latestFilingEvent">
+                                    <div class="event-info">
+                                        <div class="event-date" id="latestFilingDate">-</div>
+                                        <div class="event-details">
+                                            <h5>Latest Filing Date</h5>
+                                            <p>Last day you can submit your OPT application</p>
+                                        </div>
+                                    </div>
+                                    <button class="calendar-add-btn" id="addLatestFiling" data-date="" data-title="OPT Application - Latest Filing Date" data-description="Last day you can submit your OPT application">
+                                        <span class="btn-icon">📅</span>
+                                        <span class="btn-text">Add</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="calendar-info">
+                                <small>✨ Calendar invites work with Google Calendar, Apple Calendar, Outlook, and most calendar apps</small>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- USCIS Status Checker -->
