@@ -155,6 +155,7 @@ class OPTGuide {
     try {
       // Create a temporary link element
       const link = document.createElement('a');
+      // Use the correct path for the PDF file
       link.href = pdfFileName;
       link.download = pdfFileName;
       link.style.display = 'none';
@@ -373,7 +374,7 @@ class OPTGuide {
       this.showPDFLoading();
       
       // Use a more reliable method to navigate PDF pages
-      const baseUrl = '(Updated 01 -2025) Student-Facing OPT USCIS E-Filing Instructions - US Letter (11 x 8.5 in).pdf';
+      const baseUrl = '%28Updated%2001%20-2025%29%20Student-Facing%20OPT%20USCIS%20E-Filing%20Instructions%20-%20US%20Letter%20%2811%20x%208.5%20in%29.pdf';
       const newSrc = `${baseUrl}#page=${this.currentPage}&toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
       
       // Force iframe reload with new page
@@ -456,7 +457,7 @@ class OPTGuide {
   }
 
   openPDFInNewTab() {
-    const pdfUrl = '(Updated 01 -2025) Student-Facing OPT USCIS E-Filing Instructions - US Letter (11 x 8.5 in).pdf';
+    const pdfUrl = '%28Updated%2001%20-2025%29%20Student-Facing%20OPT%20USCIS%20E-Filing%20Instructions%20-%20US%20Letter%20%2811%20x%208.5%20in%29.pdf';
     window.open(pdfUrl, '_blank');
   }
 

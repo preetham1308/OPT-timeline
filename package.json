@@ -4,8 +4,8 @@
   "description": "A production-grade OPT Timeline Planner with dark theme, mobile optimization, and USCIS integration",
   "main": "index.html",
   "scripts": {
-    "start": "python3 -m http.server 8000",
-    "dev": "python3 -m http.server 8000",
+    "dev": "node local-server.js",
+    "start": "node local-server.js",
     "serve": "python3 -m http.server 8000",
     "test": "echo \"No tests specified\" && exit 0"
   },
