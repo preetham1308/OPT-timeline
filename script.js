@@ -123,6 +123,14 @@ class OPTPlanner {
     
     // Show custom picker when button is clicked
     openDatePickerBtn.addEventListener('click', () => {
+      // Track date picker open
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'date_picker_open', {
+          'event_category': 'engagement',
+          'event_label': 'graduation_date'
+        });
+      }
+      
       customPicker.style.display = 'block';
       
       // Prevent body scroll on mobile
@@ -149,6 +157,16 @@ class OPTPlanner {
         const selectedDate = new Date(year, month, day);
         this.selectedDate = selectedDate;
         this.updateDateInput(this.selectedDate);
+        
+        // Track successful date selection
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'date_selected', {
+            'event_category': 'engagement',
+            'event_label': 'graduation_date',
+            'value': selectedDate.toISOString().split('T')[0]
+          });
+        }
+        
         customPicker.style.display = 'none';
         
         if (isMobile()) {
@@ -478,6 +496,15 @@ class OPTPlanner {
 
   handleFormSubmit(e) {
     e.preventDefault();
+    
+    // Track form submission
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'form_submit', {
+        'event_category': 'engagement',
+        'event_label': 'timeline_calculation'
+      });
+    }
+    
     this.calculateTimeline();
     this.showTimelineResults();
   }
