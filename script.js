@@ -35,15 +35,27 @@ class OPTPlanner {
 
   bindDatePresets() {
     // Graduation date presets
-    const graduationPresets = document.querySelectorAll('#graduationDate + .date-presets .date-preset');
+    const graduationPresets = document.querySelectorAll('#dateDisplay + .date-presets .date-preset');
     graduationPresets.forEach(preset => {
       preset.addEventListener('click', () => {
         const days = parseInt(preset.dataset.days);
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + days);
         
+        // Update hidden input
         const formattedDate = targetDate.toISOString().split('T')[0];
         document.getElementById('graduationDate').value = formattedDate;
+        
+        // Update display
+        const dateDisplay = document.getElementById('dateDisplay');
+        const dateText = dateDisplay.querySelector('.date-text');
+        const displayDate = targetDate.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        dateText.textContent = displayDate;
+        dateText.classList.add('has-date');
         
         // Update active state
         graduationPresets.forEach(p => p.classList.remove('active'));
@@ -54,7 +66,7 @@ class OPTPlanner {
     });
 
     // STEM OPT end date presets
-    const stemPresets = document.querySelectorAll('#stemOptEndDate + .date-presets .date-preset');
+    const stemPresets = document.querySelectorAll('#stemDateDisplay + .date-presets .date-preset');
     stemPresets.forEach(preset => {
       preset.addEventListener('click', () => {
         const days = parseInt(preset.dataset.days);
@@ -65,8 +77,20 @@ class OPTPlanner {
           const targetDate = new Date(gradDate);
           targetDate.setDate(targetDate.getDate() + days);
           
+          // Update hidden input
           const formattedDate = targetDate.toISOString().split('T')[0];
           document.getElementById('stemOptEndDate').value = formattedDate;
+          
+          // Update display
+          const stemDateDisplay = document.getElementById('stemDateDisplay');
+          const stemDateText = stemDateDisplay.querySelector('.date-text');
+          const displayDate = targetDate.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          });
+          stemDateText.textContent = displayDate;
+          stemDateText.classList.add('has-date');
           
           // Update active state
           stemPresets.forEach(p => p.classList.remove('active'));
@@ -84,28 +108,102 @@ class OPTPlanner {
   initCustomDatePicker() {
     const graduationInput = document.getElementById('graduationDate');
     const customPicker = document.getElementById('customGraduationPicker');
+    const dateDisplay = document.getElementById('dateDisplay');
+    const dateText = dateDisplay.querySelector('.date-text');
+    const openDatePickerBtn = document.getElementById('openDatePicker');
     
-    // Show custom picker when input is focused
-    graduationInput.addEventListener('focus', () => {
-      // Check if native date picker is working
-      if (this.isNativeDatePickerWorking()) {
-        return; // Use native picker if it works
-      }
-      
-      // Show custom picker
+    // Mobile detection
+    const isMobile = () => {
+      return window.innerWidth <= 768 || 
+             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
+    
+    // Initialize date selector
+    this.initializeDateSelector();
+    
+    // Show custom picker when button is clicked
+    openDatePickerBtn.addEventListener('click', () => {
       customPicker.style.display = 'block';
-      this.renderCustomCalendar();
-    });
-
-    // Hide custom picker when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!customPicker.contains(e.target) && e.target !== graduationInput) {
-        customPicker.style.display = 'none';
+      
+      // Prevent body scroll on mobile
+      if (isMobile()) {
+        document.body.classList.add('date-picker-open');
       }
     });
 
-    // Bind custom picker events
-    this.bindCustomPickerEvents();
+    // Close picker when close button is clicked
+    document.getElementById('closeDatePicker').addEventListener('click', () => {
+      customPicker.style.display = 'none';
+      if (isMobile()) {
+        document.body.classList.remove('date-picker-open');
+      }
+    });
+
+    // Set date when Set Date button is clicked
+    document.getElementById('setDateBtn').addEventListener('click', () => {
+      const month = parseInt(document.getElementById('monthSelect').value);
+      const day = parseInt(document.getElementById('daySelect').value);
+      const year = parseInt(document.getElementById('yearSelect').value);
+      
+      if (day && year) {
+        const selectedDate = new Date(year, month, day);
+        this.selectedDate = selectedDate;
+        this.updateDateInput(this.selectedDate);
+        customPicker.style.display = 'none';
+        
+        if (isMobile()) {
+          document.body.classList.remove('date-picker-open');
+        }
+      }
+    });
+
+    // Today button functionality
+    document.getElementById('todayBtn').addEventListener('click', () => {
+      const today = new Date();
+      this.selectedDate = today;
+      this.updateDateInput(this.selectedDate);
+      this.setDateSelectorValues(today);
+      customPicker.style.display = 'none';
+      
+      if (isMobile()) {
+        document.body.classList.remove('date-picker-open');
+      }
+    });
+
+    // Hide picker when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!customPicker.contains(e.target) && e.target !== openDatePickerBtn) {
+        customPicker.style.display = 'none';
+        if (isMobile()) {
+          document.body.classList.remove('date-picker-open');
+        }
+      }
+    });
+
+    // Additional mobile close handlers
+    if (isMobile()) {
+      // Close on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && customPicker.style.display === 'block') {
+          customPicker.style.display = 'none';
+          document.body.classList.remove('date-picker-open');
+        }
+      });
+      
+      // Close on touch outside (mobile specific)
+      document.addEventListener('touchstart', (e) => {
+        if (!customPicker.contains(e.target) && e.target !== openDatePickerBtn) {
+          customPicker.style.display = 'none';
+          document.body.classList.remove('date-picker-open');
+        }
+      });
+    }
+    
+    // Mobile test - log mobile status
+    if (isMobile()) {
+      console.log('Mobile device detected - Simple date selector enabled');
+      customPicker.style.display = 'none';
+    }
   }
 
   isNativeDatePickerWorking() {
@@ -149,12 +247,20 @@ class OPTPlanner {
       this.selectedDate = new Date();
       this.updateDateInput(this.selectedDate);
       customPicker.style.display = 'none';
+      // Restore body scroll on mobile
+      if (window.innerWidth <= 768) {
+        document.body.classList.remove('date-picker-open');
+      }
     });
     
     clearBtn.addEventListener('click', () => {
       this.selectedDate = null;
       document.getElementById('graduationDate').value = '';
       customPicker.style.display = 'none';
+      // Restore body scroll on mobile
+      if (window.innerWidth <= 768) {
+        document.body.classList.remove('date-picker-open');
+      }
     });
   }
 
@@ -208,6 +314,10 @@ class OPTPlanner {
           this.updateDateInput(this.selectedDate);
           customPicker.style.display = 'none';
           this.renderCustomCalendar();
+          // Restore body scroll on mobile
+          if (window.innerWidth <= 768) {
+            document.body.classList.remove('date-picker-open');
+          }
         }
       });
       
@@ -228,7 +338,23 @@ class OPTPlanner {
 
   updateDateInput(date) {
     const formattedDate = date.toISOString().split('T')[0];
-    document.getElementById('graduationDate').value = formattedDate;
+    const graduationDate = document.getElementById('graduationDate');
+    const dateDisplay = document.getElementById('dateDisplay');
+    const dateText = dateDisplay.querySelector('.date-text');
+    
+    // Update hidden input
+    graduationDate.value = formattedDate;
+    
+    // Update display text
+    const displayDate = date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    dateText.textContent = displayDate;
+    dateText.classList.add('has-date');
+    
+    // Trigger calculation
     this.autoCalculate();
   }
 
@@ -260,7 +386,21 @@ class OPTPlanner {
     defaultDate.setMonth(defaultDate.getMonth() + 3);
     
     const formattedDate = defaultDate.toISOString().split('T')[0];
-    document.getElementById('graduationDate').value = formattedDate;
+    const graduationDate = document.getElementById('graduationDate');
+    const dateDisplay = document.getElementById('dateDisplay');
+    const dateText = dateDisplay.querySelector('.date-text');
+    
+    // Update hidden input
+    graduationDate.value = formattedDate;
+    
+    // Update display
+    const displayDate = defaultDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    dateText.textContent = displayDate;
+    dateText.classList.add('has-date');
     
     // Trigger STEM change handler to set up initial state
     this.handleSTEMChange();
@@ -717,6 +857,83 @@ class OPTPlanner {
         notification.parentNode.removeChild(notification);
       }
     }, 300);
+  }
+
+  initializeDateSelector() {
+    // Populate year selector (current year + 10 years)
+    const yearSelect = document.getElementById('yearSelect');
+    const currentYear = new Date().getFullYear();
+    
+    for (let year = currentYear; year <= currentYear + 10; year++) {
+      const option = document.createElement('option');
+      option.value = year;
+      option.textContent = year;
+      yearSelect.appendChild(option);
+    }
+    
+    // Set current year as default
+    yearSelect.value = currentYear;
+    
+    // Populate day selector
+    this.updateDaySelector();
+    
+    // Set current month as default
+    const monthSelect = document.getElementById('monthSelect');
+    monthSelect.value = new Date().getMonth();
+    
+    // Update days when month changes
+    monthSelect.addEventListener('change', () => {
+      this.updateDaySelector();
+    });
+    
+    // Update days when year changes
+    yearSelect.addEventListener('change', () => {
+      this.updateDaySelector();
+    });
+  }
+  
+  updateDaySelector() {
+    const monthSelect = document.getElementById('monthSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const daySelect = document.getElementById('daySelect');
+    
+    const month = parseInt(monthSelect.value);
+    const year = parseInt(yearSelect.value);
+    
+    // Clear existing days
+    daySelect.innerHTML = '';
+    
+    // Get number of days in selected month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Add day options
+    for (let day = 1; day <= daysInMonth; day++) {
+      const option = document.createElement('option');
+      option.value = day;
+      option.textContent = day;
+      daySelect.appendChild(option);
+    }
+    
+    // Set current day as default
+    const currentDay = new Date().getDate();
+    if (currentDay <= daysInMonth) {
+      daySelect.value = currentDay;
+    }
+  }
+  
+  setDateSelectorValues(date) {
+    const monthSelect = document.getElementById('monthSelect');
+    const daySelect = document.getElementById('daySelect');
+    const yearSelect = document.getElementById('yearSelect');
+    
+    monthSelect.value = date.getMonth();
+    yearSelect.value = date.getFullYear();
+    
+    // Update days for the selected month/year
+    this.updateDaySelector();
+    
+    // Set the day
+    daySelect.value = date.getDate();
   }
 }
 
