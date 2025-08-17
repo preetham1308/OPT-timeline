@@ -13,7 +13,7 @@
       gtag('config', 'G-14X8EGCXSH');
     </script>
     
-    <title>OPT Timeline Planner</title>
+    <title>OPTPLANNER - OPT Timeline Planner</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -26,27 +26,65 @@
     </div>
 
     <div class="app-container">
-        <!-- Header Section -->
-        <header class="header">
-            <div class="brand">
-                <span class="brand-number">OPT</span>
-                <span class="brand-text">Timeline</span>
+        <!-- Buy Me a Coffee Button -->
+        <div class="coffee-section">
+            <a href="https://donate.cancer.org/?campaign=searchmedia&utm_source=google&utm_medium=cpc&utm_campaignid=22866610247&utm_adgroupid=&utm_keyword=&gad_source=1&gad_campaignid=22860832071&gbraid=0AAAAAD2heed9jeR9efLUmUL68FjaAPLEj&gclid=Cj0KCQjw-4XFBhCBARIsAAdNOkui_TGaDZ6oEpJ6O2TqHPD7NEbw2zhTStsa4a20exoRBlC1_HPC4cYaAtNoEALw_wcB" 
+               target="_blank" 
+               class="coffee-button">
+                <span class="coffee-icon">☕</span>
+                <div class="coffee-text">
+                    <span class="coffee-title">Buy Me a Coffee</span>
+                    <span class="coffee-subtitle">(I'm fortunate to handle it! Donate to cancer research instead 😄)</span>
+                </div>
+                <span class="coffee-arrow">→</span>
+            </a>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="main-navigation">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1 class="site-title">OPTPLANNER</h1>
+                </div>
+                <div class="nav-menu">
+                    <a href="index.html" class="nav-link active">
+                        <span class="nav-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="guide.html" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        <span>Step-by-Step Guide</span>
+                    </a>
+                </div>
             </div>
-            <div class="header-stats">
-                <div class="stat-item">
-                    <span class="stat-number" data-target="90">0</span>
-                    <span class="stat-label">Days Before</span>
+        </nav>
+
+        <!-- Main optplanner Heading -->
+        <div class="main-heading">
+            <h1 class="main-title">OPTPLANNER</h1>
+            <div class="planning-quote">
+                <p>"Time lost is never found again. Plan ahead."</p>
+            </div>
+        </div>
+
+        <!-- OPT Timeline Metrics Section -->
+        <div class="timeline-metrics">
+            <h2 class="metrics-title">OPT Timeline</h2>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-number">90</span>
+                    <span class="metric-label">Days Before</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" data-target="60">0</span>
-                    <span class="stat-label">Days After</span>
+                <div class="metric-item">
+                    <span class="metric-number">60</span>
+                    <span class="metric-label">Days After</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" data-target="12">0</span>
-                    <span class="stat-label">Months OPT</span>
+                <div class="metric-item">
+                    <span class="metric-number">12</span>
+                    <span class="metric-label">Months OPT</span>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -54,7 +92,7 @@
                 <!-- Left Panel - Input Form -->
                 <div class="input-panel">
                     <div class="panel-header">
-                        <h2>Graduation Details</h2>
+                        <h2>OPT Timeline</h2>
                         <p>Enter your information to calculate OPT timelines</p>
                     </div>
                     
@@ -62,19 +100,38 @@
                         <div class="form-group">
                             <label for="graduationDate">Graduation Date</label>
                             <div class="date-input-wrapper">
-                                <input type="date" id="graduationDate" required>
-                            </div>
-                            <div class="date-presets">
-                                <button type="button" class="date-preset" data-days="30">30 days</button>
-                                <button type="button" class="date-preset" data-days="90">3 months</button>
-                                <button type="button" class="date-preset" data-days="180">6 months</button>
-                                <button type="button" class="date-preset" data-days="365">1 year</button>
+                                <div class="custom-date-picker" id="customDatePicker">
+                                    <div class="picker-header">
+                                        <button type="button" class="picker-nav" id="prevMonth" aria-label="Previous month">‹</button>
+                                        <span class="current-month" id="currentMonth">December 2024</span>
+                                        <button type="button" class="picker-nav" id="nextMonth" aria-label="Next month">›</button>
+                                    </div>
+                                    <div class="picker-days-header">
+                                        <span>Sun</span>
+                                        <span>Mon</span>
+                                        <span>Tue</span>
+                                        <span>Wed</span>
+                                        <span>Thu</span>
+                                        <span>Fri</span>
+                                        <span>Sat</span>
+                                    </div>
+                                    <div class="picker-days" id="pickerDays"></div>
+                                    <div class="picker-actions">
+                                        <button type="button" class="picker-btn today-btn" id="todayBtn">Today</button>
+                                        <button type="button" class="picker-btn clear-btn" id="clearBtn">Clear</button>
+                                    </div>
+                                </div>
+                                <input type="date" id="graduationDate" required style="display: none;">
+                                <button type="button" class="date-trigger-btn" id="dateTriggerBtn" aria-label="Open date picker to choose graduation date" aria-haspopup="true" aria-expanded="false">
+                                    <span class="btn-icon">📊</span>
+                                    <span class="btn-text">Choose Graduation Date</span>
+                                </button>
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="programLevel">
-                                <span class="label-icon">🎓</span>
+                                <span class="label-icon">⚡</span>
                                 Program Level
                             </label>
                             <select id="programLevel">
@@ -86,7 +143,7 @@
                         
                         <div class="form-group">
                             <label for="isSTEM">
-                                <span class="label-icon">🔬</span>
+                                <span class="label-icon">⚙️</span>
                                 STEM Extension
                             </label>
                             <select id="isSTEM">
@@ -97,7 +154,7 @@
                         
                         <div class="form-group" id="stemOptEndGroup" style="display: none;">
                             <label for="stemOptEndDate">
-                                <span class="label-icon">📅</span>
+                                <span class="label-icon">⏰</span>
                                 OPT End Date
                                 <span class="help-text">(When your current OPT expires - for STEM extension planning)</span>
                             </label>
@@ -106,7 +163,7 @@
                                 <div class="date-display" id="stemDateDisplay">
                                     <span class="date-text">Select OPT End Date</span>
                                     <button type="button" class="date-picker-btn" id="openStemDatePicker">
-                                        <span class="btn-icon">📅</span>
+                                        <span class="btn-icon">📊</span>
                                         Choose Date
                                     </button>
                                 </div>
@@ -114,11 +171,7 @@
                                 <!-- Hidden input for form submission -->
                                 <input type="hidden" id="stemOptEndDate">
                                 
-                                <!-- Date presets -->
-                                <div class="date-presets">
-                                    <button type="button" class="date-preset" data-days="365">1 year</button>
-                                    <button type="button" class="date-preset" data-days="730">2 years</button>
-                                </div>
+
                             </div>
                         </div>
                         
@@ -145,38 +198,38 @@
                         
                         <div class="timeline-grid">
                             <div class="timeline-item critical">
-                                <div class="timeline-icon">⚠️</div>
+                                <div class="timeline-icon">🚀</div>
                                 <div class="timeline-content">
-                                    <h4>Earliest Filing</h4>
+                                    <h4>First Day You Can Apply</h4>
                                     <div class="timeline-date" id="earliestFiling"></div>
-                                    <p>90 days before graduation</p>
+                                    <p>You can submit your OPT application starting from this date</p>
                                 </div>
                             </div>
                             
                             <div class="timeline-item important">
-                                <div class="timeline-icon">🎯</div>
+                                <div class="timeline-icon">⏳</div>
                                 <div class="timeline-content">
-                                    <h4>Latest Filing</h4>
+                                    <h4>Last Day You Can Apply</h4>
                                     <div class="timeline-date" id="latestFiling"></div>
-                                    <p>60 days after graduation</p>
+                                    <p>You must submit your OPT application by this date</p>
                                 </div>
                             </div>
                             
                             <div class="timeline-item info">
-                                <div class="timeline-icon">📅</div>
+                                <div class="timeline-icon">📊</div>
                                 <div class="timeline-content">
-                                    <h4>OPT Start Window</h4>
+                                    <h4>Earliest OPT Start Date</h4>
                                     <div class="timeline-date" id="startWindow"></div>
-                                    <p>From graduation to 60 days after</p>
+                                    <p id="startWindowText">Earliest date you can begin working on OPT</p>
                                 </div>
                             </div>
                             
                             <div class="timeline-item success">
-                                <div class="timeline-icon">✅</div>
+                                <div class="timeline-icon">💎</div>
                                 <div class="timeline-content">
-                                    <h4>OPT Duration</h4>
+                                    <h4>How Long OPT Lasts</h4>
                                     <div class="timeline-date" id="optDuration"></div>
-                                    <p id="optDurationText">Standard OPT period</p>
+                                    <p id="optDurationText">Total time you can work on OPT</p>
                                 </div>
                             </div>
                         </div>
@@ -189,7 +242,7 @@
                             </div>
                             <div class="timeline-grid">
                                 <div class="timeline-item info">
-                                    <div class="timeline-icon">🔬</div>
+                                    <div class="timeline-icon">⚡</div>
                                     <div class="timeline-content">
                                         <h4>STEM Extension Filing</h4>
                                         <div class="timeline-date" id="stemFilingWindow"></div>
@@ -197,7 +250,7 @@
                                     </div>
                                 </div>
                                 <div class="timeline-item success">
-                                    <div class="timeline-icon">📈</div>
+                                    <div class="timeline-icon">🌟</div>
                                     <div class="timeline-content">
                                         <h4>Total OPT Period</h4>
                                         <div class="timeline-date" id="totalOptPeriod"></div>
@@ -219,6 +272,9 @@
                                     <span class="countdown-label">Days until latest filing</span>
                                 </div>
                             </div>
+                            <div class="current-time-display">
+                                <small>Calculated as of: <span id="currentTimeDisplay">-</span></small>
+                            </div>
                         </div>
                     </div>
 
@@ -226,30 +282,20 @@
                     <div class="uscis-section">
                         <div class="section-header">
                             <h3>USCIS Case Status Checker</h3>
-                            <p>Check your application status using official USCIS API</p>
-                            <div class="legal-disclaimer">
-                                <small>🔗 Connected to official USCIS Case Status API (Sandbox Mode)</small>
-                                <div class="production-notice">
-                                    <small>⚠️ Production access request pending - Currently only works with sandbox test data</small>
-                                </div>
-                            </div>
+                            <p>Check your application status using the official USCIS website</p>
                         </div>
                         
                         <form id="uscisForm" class="uscis-form">
                             <div class="form-group">
                                 <label for="receiptNumber">Receipt Number</label>
                                 <input type="text" id="receiptNumber" placeholder="e.g., EAC9999103403" required>
-                                <small class="form-help">Enter your USCIS receipt number (currently testing with sandbox data)</small>
+                                <small class="form-help">Enter your USCIS receipt number to copy and paste in the status tracker</small>
                             </div>
                             
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">
                                     <span class="btn-text">Check Case Status</span>
-                                    <span class="btn-icon">🔍</span>
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="testSandboxBtn">
-                                    <span class="btn-text">Test Sandbox</span>
-                                    <span class="btn-icon">🧪</span>
+                                    <span class="btn-icon">📋</span>
                                 </button>
                             </div>
                         </form>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-14X8EGCXSH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-14X8EGCXSH');
+    </script>
+    
+    <title>OPTPLANNER - OPT Application Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="guide-styles.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="floating-number" data-number="90">90</div>
+        <div class="floating-number" data-number="60">60</div>
+        <div class="floating-number" data-number="12">12</div>
+        <div class="floating-number" data-number="24">24</div>
+    </div>
+
+    <div class="app-container">
+        <!-- Navigation Menu -->
+        <nav class="main-navigation">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1 class="site-title">OPTPLANNER</h1>
+                </div>
+                <div class="nav-menu">
+                    <a href="index.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span>Home</span>
+                        </a>
+                    <a href="guide.html" class="nav-link active">
+                        <span class="nav-icon">📋</span>
+                        <span>Step-by-Step Guide</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header Navigation -->
+        <header class="guide-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="guide-title">OPT Application Guide</h1>
+                </div>
+                <div class="header-right">
+                    <button class="download-btn" id="downloadPdf">
+                        <span class="btn-icon">📄</span>
+                        <span>Download PDF</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Guide Navigation -->
+        <nav class="guide-navigation">
+            <div class="nav-container">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-section="overview">Overview</button>
+                    <button class="nav-tab" data-section="preparation">Preparation</button>
+                    <button class="nav-tab" data-section="application">Application</button>
+                    <button class="nav-tab" data-section="submission">Submission</button>
+                    <button class="nav-tab" data-section="tracking">Tracking</button>
+                    <button class="nav-tab" data-section="pdf-guide">PDF Guide</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Guide Content -->
+        <main class="guide-content">
+            <!-- Overview Section -->
+            <section id="overview" class="guide-section active">
+                <div class="section-header">
+                    <h2>OPT Application Overview</h2>
+                    <p>Complete step-by-step guide for filing your OPT application with USCIS</p>
+                </div>
+                
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>What is OPT?</h3>
+                        <p>Optional Practical Training (OPT) allows F-1 students to work in the US for up to 12 months after graduation, with possible 24-month STEM extension.</p>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">⏳</div>
+                        <h3>Timing is Critical</h3>
+                        <p>File between 90 days before and 60 days after graduation. OPT must start within 60 days of graduation.</p>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Required Documents</h3>
+                        <p>I-765 form, passport photos, I-20 with OPT recommendation, transcripts, and payment.</p>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="card-icon">💎</div>
+                        <h3>Filing Fee</h3>
+                        <p>Current filing fee is $410. Additional biometrics fee may apply.</p>
+                    </div>
+                </div>
+
+                <div class="quick-start">
+                    <h3>Quick Start Checklist</h3>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <span class="check">●</span>
+                            <span>Meet with your DSO</span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="check">●</span>
+                            <span>Gather required documents</span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="check">●</span>
+                            <span>Complete I-765 form</span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="check">●</span>
+                            <span>Submit application to USCIS</span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="check">●</span>
+                            <span>Track your case status</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Preparation Section -->
+            <section id="preparation" class="guide-section">
+                <div class="section-header">
+                    <h2>Preparation Phase</h2>
+                    <p>Essential steps to take before filing your OPT application</p>
+                </div>
+
+                <div class="step-timeline">
+                    <div class="timeline-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Meet with Your DSO</h3>
+                            <p>Schedule an appointment with your Designated School Official (DSO) to discuss OPT eligibility and requirements.</p>
+                            <div class="step-details">
+                                <strong>What to bring:</strong>
+                                <ul>
+                                    <li>Current passport</li>
+                                    <li>I-94 record</li>
+                                    <li>Academic transcripts</li>
+                                    <li>Graduation date confirmation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Request OPT Recommendation</h3>
+                            <p>Your DSO will update your SEVIS record and provide a new I-20 with OPT recommendation.</p>
+                            <div class="step-details">
+                                <strong>Timeline:</strong> Request at least 2-3 weeks before you plan to file
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Gather Required Documents</h3>
+                            <p>Collect all necessary documents for your application package.</p>
+                            <div class="step-details">
+                                <strong>Required documents:</strong>
+                                <ul>
+                                    <li>Form I-765 (Application for Employment Authorization)</li>
+                                    <li>Passport-style photos (2 copies)</li>
+                                    <li>Copy of current I-20 with OPT recommendation</li>
+                                    <li>Copy of passport biographical page</li>
+                                    <li>Copy of I-94 arrival record</li>
+                                    <li>Copy of F-1 visa</li>
+                                    <li>Copy of transcripts or diploma</li>
+                                    <li>Payment method (check, money order, or credit card)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Application Section -->
+            <section id="application" class="guide-section">
+                <div class="section-header">
+                    <h2>Completing Form I-765</h2>
+                    <p>Step-by-step instructions for filling out the employment authorization application</p>
+                </div>
+
+                <div class="form-guide">
+                    <div class="form-section">
+                        <h3>Part 1: Personal Information</h3>
+                        <div class="form-field">
+                            <label>1. Family Name (Last Name)</label>
+                            <p>Enter your family name exactly as it appears on your passport and I-20.</p>
+                        </div>
+                        <div class="form-field">
+                            <label>2. Given Name (First Name)</label>
+                            <p>Enter your given name exactly as it appears on your passport and I-20.</p>
+                        </div>
+                        <div class="form-field">
+                            <label>3. Middle Name</label>
+                            <p>Enter your middle name if applicable, or leave blank if none.</p>
+                        </div>
+                        <div class="form-field">
+                            <label>4. Other Names Used</label>
+                            <p>List any other names you have used, including maiden name if applicable.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Part 2: Information About Your Eligibility</h3>
+                        <div class="form-field">
+                            <label>27. Eligibility Category</label>
+                            <p>Select "(c)(3)(A)" for pre-completion OPT or "(c)(3)(B)" for post-completion OPT.</p>
+                        </div>
+                        <div class="form-field">
+                            <label>28. Eligibility Category Explanation</label>
+                            <p>Write: "F-1 student seeking post-completion optional practical training."</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Part 3: Additional Information</h3>
+                        <div class="form-field">
+                            <label>Additional Information</label>
+                            <p>If you have any additional information that supports your application, include it here.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="important-notes">
+                    <h3>Important Notes</h3>
+                    <ul>
+                        <li>Use black ink and print clearly</li>
+                        <li>Do not leave any fields blank - use "N/A" if not applicable</li>
+                        <li>Sign and date the form in blue ink</li>
+                        <li>Make a copy of the completed form for your records</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Submission Section -->
+            <section id="submission" class="guide-section">
+                <div class="section-header">
+                    <h2>Submitting Your Application</h2>
+                    <p>How to properly submit your OPT application to USCIS</p>
+                </div>
+
+                <div class="submission-steps">
+                    <div class="submission-step">
+                        <div class="step-icon">📦</div>
+                        <h3>Prepare Your Package</h3>
+                        <p>Organize your documents in the correct order:</p>
+                        <ol>
+                            <li>Form I-765</li>
+                            <li>Payment (check or money order)</li>
+                            <li>Supporting documents</li>
+                            <li>Passport photos</li>
+                        </ol>
+                    </div>
+
+                    <div class="submission-step">
+                        <div class="step-icon">📮</div>
+                        <h3>Choose Filing Method</h3>
+                        <p>You can file either online or by mail:</p>
+                        <div class="filing-options">
+                            <div class="filing-option">
+                                <h4>Online Filing (Recommended)</h4>
+                                <p>File through USCIS online portal for faster processing and tracking.</p>
+                                <a href="https://www.uscis.gov/i-765" target="_blank" class="uscis-link">USCIS Online Portal</a>
+                            </div>
+                            <div class="filing-option">
+                                <h4>Mail Filing</h4>
+                                <p>Send to the appropriate USCIS lockbox based on your location.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="submission-step">
+                        <div class="step-icon">⚡</div>
+                        <h3>Track Your Application</h3>
+                        <p>After submission, you'll receive:</p>
+                        <ul>
+                            <li>Receipt notice (Form I-797C)</li>
+                            <li>Receipt number for tracking</li>
+                            <li>Biometrics appointment notice (if required)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tracking Section -->
+            <section id="tracking" class="guide-section">
+                <div class="section-header">
+                    <h2>Tracking Your Application</h2>
+                    <p>How to monitor your OPT application status and what to expect</p>
+                </div>
+
+                <div class="tracking-info">
+                    <div class="tracking-card">
+                        <h3>Receipt Notice</h3>
+                        <p>You should receive a receipt notice within 2-3 weeks of filing. This contains your receipt number for tracking.</p>
+                    </div>
+
+                    <div class="tracking-card">
+                        <h3>Biometrics Appointment</h3>
+                        <p>If required, you'll receive a biometrics appointment notice. Attend this appointment to provide fingerprints and photo.</p>
+                    </div>
+
+                    <div class="tracking-card">
+                        <h3>Processing Times</h3>
+                        <p>Current processing times vary by location but typically range from 3-5 months. Check USCIS processing times for updates.</p>
+                    </div>
+
+                    <div class="tracking-card">
+                        <h3>Approval Notice</h3>
+                        <p>Upon approval, you'll receive Form I-766 (Employment Authorization Document) and approval notice.</p>
+                    </div>
+                </div>
+
+                <div class="case-status-checker">
+                    <h3>Check Your Case Status</h3>
+                    <p>Use your receipt number to track your application:</p>
+                    <a href="https://egov.uscis.gov/casestatus/landing.do" target="_blank" class="status-checker-btn">
+                        <span class="btn-icon">🔍</span>
+                        <span>Check Case Status</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- PDF Guide Section -->
+            <section id="pdf-guide" class="guide-section">
+                <div class="section-header">
+                    <h2>USCIS E-Filing Instructions PDF</h2>
+                    <p>Interactive PDF viewer with step-by-step navigation</p>
+                </div>
+
+                <div class="pdf-viewer-container">
+                    <div class="pdf-controls">
+                        <button class="pdf-nav-btn" id="prevPage" disabled>
+                            <span class="btn-icon">‹</span>
+                            <span>Previous</span>
+                        </button>
+                        
+                        <div class="page-info">
+                            <span class="current-page">1</span>
+                            <span class="page-separator">/</span>
+                            <span class="total-pages">-</span>
+                        </div>
+                        
+                        <button class="pdf-nav-btn" id="nextPage">
+                            <span class="btn-text">Next</span>
+                            <span class="btn-icon">›</span>
+                        </button>
+                    </div>
+
+                    <div class="pdf-viewer">
+                        <iframe 
+                            id="pdfFrame" 
+                            src="(Updated 01 -2025) Student-Facing OPT USCIS E-Filing Instructions - US Letter (11 x 8.5 in).pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+                            width="100%" 
+                            height="600px"
+                            frameborder="0"
+                            title="OPT USCIS E-Filing Instructions PDF">
+                        </iframe>
+                    </div>
+
+                    <div class="pdf-actions">
+                        <button class="pdf-action-btn" id="downloadPdfInline">
+                            <span class="btn-icon">📥</span>
+                            <span>Download PDF</span>
+                        </button>
+                        <button class="pdf-action-btn" id="openPdfNewTab">
+                            <span class="btn-icon">🔗</span>
+                            <span>Open in New Tab</span>
+                        </button>
+                        <button class="pdf-action-btn" id="fullscreenPdf">
+                            <span class="btn-icon">⛶</span>
+                            <span>Fullscreen</span>
+                        </button>
+                    </div>
+
+                    <div class="pdf-navigation-help">
+                        <h4>Navigation Tips</h4>
+                        <ul>
+                            <li>Use the Previous/Next buttons to navigate between pages</li>
+                            <li>Click and drag to pan around the PDF</li>
+                            <li>Use mouse wheel or pinch to zoom in/out</li>
+                            <li>Press F11 for fullscreen mode</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="guide-footer">
+            <div class="footer-content">
+                <p>This guide is for educational purposes only. Always verify information with official USCIS sources and your DSO.</p>
+                <div class="footer-links">
+                    <a href="https://www.uscis.gov/i-765" target="_blank">Official USCIS I-765 Form</a>
+                    <a href="https://www.ice.gov/sevis" target="_blank">SEVIS Information</a>
+                    <a href="index.html">Back to OPT Planner</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="guide.js"></script>
+    <script>
+        // Initialize the OPT Guide when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            new OPTGuide();
+        });
+    </script>
+</body>
+</html> 
